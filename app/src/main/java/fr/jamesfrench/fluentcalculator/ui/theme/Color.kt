@@ -7,3 +7,4 @@ val NothingRed = Color(0xFFc8102e)
 val White = Color(0xFFFFFFFF)
 
 val Black = Color(0xFF000000)
+val FaintDarkGray = Color(0xFF323234)

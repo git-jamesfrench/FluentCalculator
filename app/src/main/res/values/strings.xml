@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Fluent Calculator</string>
+    <string name="settings_description">Settings Icon</string>
 </resources>

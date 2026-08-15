@@ -6,20 +6,19 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
-import fr.jamesfrench.fluentcalculator.components.Icon
-import fr.jamesfrench.fluentcalculator.components.Text
-import fr.jamesfrench.fluentcalculator.icons.LucideCog
+import androidx.compose.ui.graphics.Color
+import fr.jamesfrench.fluentcalculator.pages.CalculatorStandard
 import fr.jamesfrench.fluentcalculator.ui.theme.C
 import fr.jamesfrench.fluentcalculator.ui.theme.FluentCalculatorTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         enableEdgeToEdge()
 
         setContent {
@@ -31,14 +30,10 @@ class MainActivity : ComponentActivity() {
                         modifier = Modifier
                             .fillMaxSize()
                             .background(C.colors.background)
-                    )
-                    Column(
-                        modifier = Modifier
                             .padding(innerPadding)
-                            .fillMaxSize()
+                            .background(Color.Red)
                     ) {
-                        Icon(LucideCog, "Settings")
-                        Text("Hello, World!")
+                        CalculatorStandard(innerPadding)
                     }
                 }
             }
