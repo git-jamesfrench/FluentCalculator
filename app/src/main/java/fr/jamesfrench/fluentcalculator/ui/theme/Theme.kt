@@ -1,7 +1,6 @@
 package fr.jamesfrench.fluentcalculator.ui.theme
 
 import android.app.Activity
-import androidx.activity.SystemBarStyle
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -10,18 +9,23 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
-import android.graphics.Color as IntColor
 
 data class FluentCalculatorColors(
     val background: Color,
-    val nothingRed: Color,
-    val statusBar: SystemBarStyle,
+    val accent: Color,
+
+    val text: Color,
+
+    val isStatusBarLight: Boolean,
 )
 
 private val DarkColorScheme = FluentCalculatorColors(
-    background = Color(0xFF000000),
-    nothingRed = Color(0xFFc8102e),
-    statusBar = SystemBarStyle.light(IntColor.TRANSPARENT, IntColor.TRANSPARENT)
+    background = Black,
+    accent = NothingRed,
+
+    text = White,
+
+    isStatusBarLight = true,
 )
 
 private val LightColorScheme = DarkColorScheme
@@ -44,7 +48,7 @@ fun FluentCalculatorTheme(
     if (!view.isInEditMode) {
         SideEffect {
             val window = (view.context as Activity).window
-            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = !darkTheme
+            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = !colorScheme.isStatusBarLight
         }
     }
 

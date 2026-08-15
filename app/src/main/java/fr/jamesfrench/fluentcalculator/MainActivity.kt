@@ -10,10 +10,10 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import fr.jamesfrench.fluentcalculator.components.Icon
+import fr.jamesfrench.fluentcalculator.components.Text
+import fr.jamesfrench.fluentcalculator.icons.LucideCog
 import fr.jamesfrench.fluentcalculator.ui.theme.C
 import fr.jamesfrench.fluentcalculator.ui.theme.FluentCalculatorTheme
 
@@ -27,41 +27,21 @@ class MainActivity : ComponentActivity() {
                 Scaffold(
                     modifier = Modifier.fillMaxSize()
                 ) { innerPadding ->
-                    Box(
+                    Box( // Background
                         modifier = Modifier
                             .fillMaxSize()
+                            .background(C.colors.background)
                     )
                     Column(
                         modifier = Modifier
                             .padding(innerPadding)
                             .fillMaxSize()
-                            .background(C.colors.nothingRed)
                     ) {
-                        Text(
-                            text = "Hello, World!"
-                        )
-                        Text(
-                            text = "Hello, World!"
-                        )
+                        Icon(LucideCog, "Settings")
+                        Text("Hello, World!")
                     }
                 }
             }
         }
-    }
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    FluentCalculatorTheme {
-        Greeting("Android")
     }
 }
