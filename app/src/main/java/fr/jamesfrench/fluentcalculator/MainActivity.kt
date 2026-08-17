@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import fr.jamesfrench.fluentcalculator.pages.CalculatorStandard
 import fr.jamesfrench.fluentcalculator.ui.theme.C
 import fr.jamesfrench.fluentcalculator.ui.theme.FluentCalculatorTheme
@@ -31,7 +30,6 @@ class MainActivity : ComponentActivity() {
                             .fillMaxSize()
                             .background(C.colors.background)
                             .padding(innerPadding)
-                            .background(Color.Red)
                     ) {
                         CalculatorStandard(innerPadding)
                     }

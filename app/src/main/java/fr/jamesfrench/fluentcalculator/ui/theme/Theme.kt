@@ -13,6 +13,7 @@ import androidx.core.view.WindowCompat
 data class FluentCalculatorColors(
     val background: Color,
     val faintHighlight: Color,
+    val highlight: Color,
     val accent: Color,
 
     val text: Color,
@@ -22,7 +23,8 @@ data class FluentCalculatorColors(
 
 private val DarkColorScheme = FluentCalculatorColors(
     background = Black,
-    faintHighlight = FaintDarkGray,
+    faintHighlight = VeryFaintDarkGray,
+    highlight = FaintDarkGray,
     accent = NothingRed,
 
     text = White,

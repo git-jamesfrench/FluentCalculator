@@ -1,13 +1,11 @@
 package fr.jamesfrench.fluentcalculator.pages
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.dp
 import fr.jamesfrench.fluentcalculator.components.Navigation
@@ -28,9 +26,14 @@ fun CalculatorStandard(
                 maxOf(0.dp, 12.dp - innerPadding.calculateRightPadding(layoutDirection)),
                 maxOf(0.dp, 12.dp - innerPadding.calculateBottomPadding()),
             )
-            .background(Color.Blue)
     ) {
-        Navigation()
+        Navigation(
+            listOf(
+                "Conversion",
+                "Standard",
+                "Scientific",
+            ),
+        )
         Text("Hello, World!")
     }
 }
