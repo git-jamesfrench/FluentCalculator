@@ -2,4 +2,5 @@
 <resources>
     <string name="app_name">Fluent Calculator</string>
     <string name="settings_description">Icône paramètres</string>
+    <string name="history_icon">Icône historique</string>
 </resources>
