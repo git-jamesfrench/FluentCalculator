@@ -5,6 +5,7 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
@@ -25,6 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextMeasurer
@@ -92,13 +94,20 @@ fun Navigation(
                 .clipToBounds()
                 .onGloballyPositioned { coordinates ->
                     selectorSize = coordinates.size
+                }
+                .pointerInput(Unit) {
+                    detectHorizontalDragGestures(
+                        onDragStart = { offset -> println("DRAG START: $offset") },
+                        onDragEnd = { println("DRAG END") },
+                        onDragCancel = { println("DRAG CANCEL") },
+                        onHorizontalDrag = { change, dragAmount -> println("HORIZONTAL DRAG: $change, $dragAmount") }
+                    )
                 },
             contentAlignment = Alignment.CenterStart
         ) {
             options.forEachIndexed { index, string ->
                 Text(
                     string,
-                    fontSize = 25.sp,
                     modifier = Modifier.offset {
                         IntOffset(
                             lengthsSummed[index] // Size of element

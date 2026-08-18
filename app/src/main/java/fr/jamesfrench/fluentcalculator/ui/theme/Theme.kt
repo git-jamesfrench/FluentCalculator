@@ -14,9 +14,14 @@ data class FluentCalculatorColors(
     val background: Color,
     val faintHighlight: Color,
     val highlight: Color,
-    val accent: Color,
-
     val text: Color,
+
+    val inverse: Color,
+    val onInverse: Color,
+    val accent: Color,
+    val onAccent: Color,
+
+
 
     val isStatusBarLight: Boolean,
 )
@@ -25,9 +30,12 @@ private val DarkColorScheme = FluentCalculatorColors(
     background = Black,
     faintHighlight = VeryFaintDarkGray,
     highlight = FaintDarkGray,
-    accent = NothingRed,
-
     text = White,
+
+    inverse = White,
+    onInverse = Black,
+    accent = NothingRed,
+    onAccent = White,
 
     isStatusBarLight = true,
 )
