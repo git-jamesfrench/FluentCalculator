@@ -12,29 +12,43 @@ import androidx.core.view.WindowCompat
 
 data class FluentCalculatorColors(
     val background: Color,
-    val faintHighlight: Color,
-    val highlight: Color,
-    val text: Color,
+    val onBackground: Color,
+
+    val surface: Color,
+    val onSurface: Color,
+
+    val neutral: Color,
+    val activeNeutral: Color,
+    val onNeutral: Color,
 
     val inverse: Color,
+    val activeInverse: Color,
     val onInverse: Color,
+
     val accent: Color,
+    val activeAccent: Color,
     val onAccent: Color,
-
-
 
     val isStatusBarLight: Boolean,
 )
 
 private val DarkColorScheme = FluentCalculatorColors(
     background = Black,
-    faintHighlight = VeryFaintDarkGray,
-    highlight = FaintDarkGray,
-    text = White,
+    onBackground = White,
+
+    surface = DarkGray,
+    onSurface = White,
+
+    neutral = FaintDarkGray,
+    activeNeutral = DarkGray,
+    onNeutral = White,
 
     inverse = White,
+    activeInverse = LighterWhite,
     onInverse = Black,
+
     accent = NothingRed,
+    activeAccent = LighterNothingRed,
     onAccent = White,
 
     isStatusBarLight = true,

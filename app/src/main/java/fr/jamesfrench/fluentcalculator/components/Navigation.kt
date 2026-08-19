@@ -80,7 +80,7 @@ fun Navigation(
         modifier = Modifier
             .fillMaxWidth()
             .height(IntrinsicSize.Min)
-            .border(1.dp, C.colors.highlight, RoundedCornerShape(100))
+            .border(1.dp, C.colors.surface, RoundedCornerShape(100))
     ) {
         // Button 1
         RoundButton(onClick = { selected -= 1 }) {

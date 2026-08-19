@@ -30,7 +30,7 @@ fun RoundButton(
     val haptic = LocalHapticFeedback.current
 
     val color = animateColorAsState(
-        targetValue = if (isPressed) C.colors.faintHighlight else C.colors.background,
+        targetValue = if (isPressed) C.colors.activeNeutral else C.colors.background,
         animationSpec = if (isPressed)
             tween(0, easing = EaseOut)
         else

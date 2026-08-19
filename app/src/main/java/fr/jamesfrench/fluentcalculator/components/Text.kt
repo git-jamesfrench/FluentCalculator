@@ -13,7 +13,7 @@ fun Text(
     text: String,
     modifier: Modifier = Modifier,
     style: TextStyle = mediumInter,
-    color: Color = C.colors.text,
+    color: Color = C.colors.onBackground,
 ) {
     MText(
         text = text,
