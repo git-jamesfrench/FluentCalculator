@@ -116,7 +116,6 @@ fun CalculatorStandard(
             ) {
                 Result(
                     modifier = Modifier.weight(1f),
-                    vm
                 )
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -149,7 +148,6 @@ fun CalculatorStandard(
             ) {
                 Result(
                     modifier = Modifier.weight(1f),
-                    vm
                 )
                 Column(
                     verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -183,7 +181,7 @@ fun CalculatorStandard(
 @Composable
 private fun Result(
     modifier: Modifier = Modifier,
-    vm: StandardViewModel
+    //vm: StandardViewModel
 ) {
     Column(
         modifier = modifier
