@@ -36,7 +36,7 @@ fun BigButton(
     text: String,
     variant: BigButtonVariant,
     modifier: Modifier = Modifier,
-    onClick: () -> Unit,
+    onClick: () -> Boolean,
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed = interactionSource.collectIsPressedAsState().value
@@ -77,8 +77,9 @@ fun BigButton(
                 indication = null,
                 interactionSource = interactionSource,
             ) {
-                haptic.performHapticFeedback(HapticFeedbackType.Confirm)
-                onClick()
+                if (onClick()) {
+                    haptic.performHapticFeedback(HapticFeedbackType.Confirm)
+                }
             },
         contentAlignment = Alignment.Center
     ) {

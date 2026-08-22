@@ -10,16 +10,31 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.selection.LocalTextSelectionColors
+import androidx.compose.foundation.text.selection.TextSelectionColors
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import fr.jamesfrench.fluentcalculator.classes.Action
 import fr.jamesfrench.fluentcalculator.classes.ButtonData
 import fr.jamesfrench.fluentcalculator.components.BigButton
 import fr.jamesfrench.fluentcalculator.components.BigButtonVariant
 import fr.jamesfrench.fluentcalculator.components.Navigation
+import fr.jamesfrench.fluentcalculator.ui.theme.C
+import fr.jamesfrench.fluentcalculator.ui.theme.largeInter
+import fr.jamesfrench.fluentcalculator.utils.DisableSoftKeyboard
 import fr.jamesfrench.fluentcalculator.viewmodels.StandardViewModel
 
 private val ButtonsVertical = listOf(
@@ -50,7 +65,7 @@ private val ButtonsVertical = listOf(
     listOf(
         ButtonData("←", BigButtonVariant.Inverse, Action.Backspace),
         ButtonData("0", BigButtonVariant.Gray, Action.Append, "0"),
-        ButtonData(",", BigButtonVariant.Gray, Action.Append, ","),
+        ButtonData(",", BigButtonVariant.Gray, Action.Append, "."),
         ButtonData("=", BigButtonVariant.Accent, Action.Equal),
     ),
 )
@@ -98,6 +113,7 @@ fun CalculatorStandard(
         Configuration.ORIENTATION_LANDSCAPE -> ButtonsHorizontal
         else -> ButtonsVertical
     }
+    // val parenthesesState = remember(vm.equation) { vm.getParenthesesState() }
 
     Column(
         modifier = Modifier
@@ -116,6 +132,7 @@ fun CalculatorStandard(
             ) {
                 Result(
                     modifier = Modifier.weight(1f),
+                    vm
                 )
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -127,13 +144,16 @@ fun CalculatorStandard(
                         ) {
                             item.forEach { item ->
                                 BigButton(
-                                    item.text,
+                                    if (item.action == Action.AddParentheses) "(" else item.text,
                                     item.variant,
                                     modifier = Modifier
                                         .weight(1f)
                                         .aspectRatio(1f),
                                     {
-                                        vm.executeKeyboardAction(item.action, item.value)
+                                        return@BigButton vm.executeKeyboardAction(
+                                            item.action,
+                                            item.value
+                                        )
                                     }
                                 )
                             }
@@ -148,6 +168,7 @@ fun CalculatorStandard(
             ) {
                 Result(
                     modifier = Modifier.weight(1f),
+                    vm
                 )
                 Column(
                     verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -159,7 +180,7 @@ fun CalculatorStandard(
                         ) {
                             item.forEach { item ->
                                 BigButton(
-                                    item.text,
+                                    if (item.action == Action.AddParentheses) "(" else item.text,
                                     item.variant,
                                     modifier = Modifier
                                         .weight(1f)
@@ -181,8 +202,14 @@ fun CalculatorStandard(
 @Composable
 private fun Result(
     modifier: Modifier = Modifier,
-    //vm: StandardViewModel
+    vm: StandardViewModel
 ) {
+    val focusRequester = remember { FocusRequester() }
+    val selectionColors = TextSelectionColors(
+        handleColor = C.colors.accent,
+        backgroundColor = C.colors.accent.copy(alpha = 0.4f)
+    )
+
     Column(
         modifier = modifier
     ) {
@@ -194,10 +221,38 @@ private fun Result(
             ),
         )
         Column(
-            modifier = Modifier.fillMaxHeight()
+            modifier = Modifier.fillMaxHeight(),
+            verticalArrangement = Arrangement.Center
         ) {
+            CompositionLocalProvider(LocalTextSelectionColors provides selectionColors) {
+                DisableSoftKeyboard {
+                    BasicTextField(
+                        value = vm.equation,
+                        onValueChange = { newValue ->
+                            vm.selectionAction(newValue)
+                        },
+                        modifier = modifier
+                            .fillMaxWidth()
+                            .wrapContentHeight()
+                            .focusRequester(focusRequester)
+                            .onFocusChanged({ state ->
+                                if (!state.isFocused) {
+                                    focusRequester.requestFocus()
+                                }
+                            }),
+                        textStyle = largeInter.copy(
+                            color = C.colors.onBackground,
+                            textAlign = TextAlign.Center
+                        ),
+                        cursorBrush = SolidColor(C.colors.accent)
 
+                    )
+                }
+            }
         }
     }
 
+    LaunchedEffect(Unit) {
+        focusRequester.requestFocus()
+    }
 }
