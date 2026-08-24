@@ -21,7 +21,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalLayoutDirection
@@ -224,28 +223,21 @@ private fun Result(
             modifier = Modifier.fillMaxHeight(),
             verticalArrangement = Arrangement.Center
         ) {
-            CompositionLocalProvider(LocalTextSelectionColors provides selectionColors) {
+            CompositionLocalProvider(
+                LocalTextSelectionColors provides selectionColors
+            ) {
                 DisableSoftKeyboard {
                     BasicTextField(
-                        value = vm.equation,
-                        onValueChange = { newValue ->
-                            vm.selectionAction(newValue)
-                        },
+                        state = vm.equation,
                         modifier = modifier
                             .fillMaxWidth()
                             .wrapContentHeight()
-                            .focusRequester(focusRequester)
-                            .onFocusChanged({ state ->
-                                if (!state.isFocused) {
-                                    focusRequester.requestFocus()
-                                }
-                            }),
+                            .focusRequester(focusRequester),
                         textStyle = largeInter.copy(
                             color = C.colors.onBackground,
                             textAlign = TextAlign.Center
                         ),
                         cursorBrush = SolidColor(C.colors.accent)
-
                     )
                 }
             }

@@ -6,5 +6,5 @@ data class ButtonData(
     val text: String,
     val variant: BigButtonVariant,
     val action: Action,
-    val value: String? = null,
+    val value: String = "",
 )
