@@ -20,14 +20,18 @@ class StandardViewModel : ViewModel() {
                 }
 
                 Action.Backspace -> {
-                    if (selection.length > 0) {
-                        delete(selection.min, selection.max)
+                    if (selection.length > 0 || selection.min > 0) {
+                        val offset =
+                            if (selection.length > 0) 0 else 1 // Offset if no selection to remove previous character
+
+                        delete(selection.min - offset, selection.max)
+                    } // Return if nothing can be deleted
+                }
+
+                Action.ClearAll -> {
+                    if (length > 0) {
+                        delete(0, length)
                         success = true
-                    } else {
-                        if (selection.min > 0) {
-                            delete(selection.min - 1, selection.min)
-                            success = true
-                        }
                     }
                 }
 
@@ -41,7 +45,7 @@ class StandardViewModel : ViewModel() {
                         }"
                     )
                     println("[$] SELECT INDEX: ${selection.min} -> ${selection.max}")
-                    println("[$] MAX INDEX: 0 -> ${maxOf(this.originalText.length - 1, 0)}")
+                    println("[$] MAX INDEX: 0 -> ${maxOf(length - 1, 0)}")
                     println("[$] AT INDEX MIN: ${this.originalText.getOrElse(selection.min) { '⚠' }}")
                     println("[$] AT INDEX MAX: ${this.originalText.getOrElse(selection.max) { '⚠' }}")
                 }
