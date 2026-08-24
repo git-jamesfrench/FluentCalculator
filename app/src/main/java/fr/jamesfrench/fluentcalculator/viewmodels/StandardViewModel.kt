@@ -2,15 +2,12 @@ package fr.jamesfrench.fluentcalculator.viewmodels
 
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.delete
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.text.TextRange
 import androidx.lifecycle.ViewModel
 import fr.jamesfrench.fluentcalculator.classes.Action
 
 class StandardViewModel : ViewModel() {
-    var equation by mutableStateOf(TextFieldState(""))
+    var equation = TextFieldState("")
 
     fun executeKeyboardAction(action: Action, value: String = ""): Boolean {
         var success = false
