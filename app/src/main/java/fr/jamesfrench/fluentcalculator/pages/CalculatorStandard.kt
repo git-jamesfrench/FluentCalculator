@@ -12,6 +12,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.input.OutputTransformation
+import androidx.compose.foundation.text.input.TextFieldBuffer
 import androidx.compose.foundation.text.selection.LocalTextSelectionColors
 import androidx.compose.foundation.text.selection.TextSelectionColors
 import androidx.compose.runtime.Composable
@@ -28,6 +30,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import fr.jamesfrench.fluentcalculator.classes.Action
 import fr.jamesfrench.fluentcalculator.classes.ButtonData
+import fr.jamesfrench.fluentcalculator.classes.T
 import fr.jamesfrench.fluentcalculator.components.BigButton
 import fr.jamesfrench.fluentcalculator.components.BigButtonVariant
 import fr.jamesfrench.fluentcalculator.components.Navigation
@@ -198,6 +201,22 @@ fun CalculatorStandard(
     }
 }
 
+class EquationTransformation : OutputTransformation {
+    override fun TextFieldBuffer.transformOutput() {
+        for (i in 0..<length) {
+            val char = this.charAt(i)
+            if (char in T.Operator.values) {
+                when (char) {
+                    '-' -> replace(i, i + 1, "−")
+                    '*' -> replace(i, i + 1, "×")
+                    '/' -> replace(i, i + 1, "÷")
+                }
+            }
+            //replace(i, i+1, "•") // Easter-egg
+        }
+    }
+}
+
 @Composable
 private fun Result(
     modifier: Modifier = Modifier,
@@ -237,7 +256,8 @@ private fun Result(
                             color = C.colors.onBackground,
                             textAlign = TextAlign.Center
                         ),
-                        cursorBrush = SolidColor(C.colors.accent)
+                        cursorBrush = SolidColor(C.colors.accent),
+                        outputTransformation = EquationTransformation()
                     )
                 }
             }
