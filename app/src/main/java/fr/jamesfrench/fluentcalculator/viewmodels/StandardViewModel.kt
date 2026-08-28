@@ -2,9 +2,10 @@ package fr.jamesfrench.fluentcalculator.viewmodels
 
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.delete
-import androidx.compose.ui.text.TextRange
 import androidx.lifecycle.ViewModel
 import fr.jamesfrench.fluentcalculator.classes.Action
+import fr.jamesfrench.fluentcalculator.classes.T
+import fr.jamesfrench.fluentcalculator.utils.getType
 
 class StandardViewModel : ViewModel() {
     var equation = TextFieldState("")
@@ -14,8 +15,21 @@ class StandardViewModel : ViewModel() {
         equation.edit {
             when (action) {
                 Action.Append -> {
+                    val isOperatorAndFirstCharacter =
+                        value[0] in T.Operator.values &&
+                                toString().getType(selection.min - 1) == T.Empty
+                    val isAloneDot =
+                        value[0] == '.' &&
+                                toString().getType(selection.min - 1) in listOf(T.Empty, T.Operator)
+
+                    when {
+                        isOperatorAndFirstCharacter -> append('0')
+                        isAloneDot -> append('0')
+                    }
+
+
                     replace(selection.min, selection.max, value)
-                    selection = TextRange(selection.max)
+                    placeCursorBeforeCharAt(selection.max)
                     success = true
                 }
 
@@ -25,7 +39,8 @@ class StandardViewModel : ViewModel() {
                             if (selection.length > 0) 0 else 1 // Offset if no selection to remove previous character
 
                         delete(selection.min - offset, selection.max)
-                    } // Return if nothing can be deleted
+                        success = true
+                    }
                 }
 
                 Action.ClearAll -> {
