@@ -2,6 +2,7 @@ package fr.jamesfrench.fluentcalculator.pages
 
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -10,22 +11,28 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.plus
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.input.OutputTransformation
 import androidx.compose.foundation.text.input.TextFieldBuffer
 import androidx.compose.foundation.text.selection.LocalTextSelectionColors
 import androidx.compose.foundation.text.selection.TextSelectionColors
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import fr.jamesfrench.fluentcalculator.classes.Action
@@ -34,10 +41,14 @@ import fr.jamesfrench.fluentcalculator.classes.T
 import fr.jamesfrench.fluentcalculator.components.BigButton
 import fr.jamesfrench.fluentcalculator.components.BigButtonVariant
 import fr.jamesfrench.fluentcalculator.components.Navigation
+import fr.jamesfrench.fluentcalculator.components.Text
 import fr.jamesfrench.fluentcalculator.ui.theme.C
 import fr.jamesfrench.fluentcalculator.ui.theme.largeInter
+import fr.jamesfrench.fluentcalculator.ui.theme.veryLargeNDot
 import fr.jamesfrench.fluentcalculator.utils.DisableSoftKeyboard
+import fr.jamesfrench.fluentcalculator.utils.copy
 import fr.jamesfrench.fluentcalculator.viewmodels.StandardViewModel
+import kotlinx.coroutines.flow.distinctUntilChanged
 
 private val ButtonsVertical = listOf(
     listOf(
@@ -106,26 +117,18 @@ private val ButtonsHorizontal = listOf(
 
 @Composable
 fun CalculatorStandard(
-    innerPadding: PaddingValues,
+    screenPadding: PaddingValues,
     vm: StandardViewModel
 ) {
-    val layoutDirection = LocalLayoutDirection.current
     val orientation = LocalConfiguration.current.orientation
     val layout = when (orientation) {
         Configuration.ORIENTATION_LANDSCAPE -> ButtonsHorizontal
         else -> ButtonsVertical
     }
-    // val parenthesesState = remember(vm.equation) { vm.getParenthesesState() }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(
-                maxOf(0.dp, 12.dp - innerPadding.calculateLeftPadding(layoutDirection)),
-                maxOf(0.dp, 12.dp - innerPadding.calculateTopPadding()),
-                maxOf(0.dp, 12.dp - innerPadding.calculateRightPadding(layoutDirection)),
-                maxOf(0.dp, 12.dp - innerPadding.calculateBottomPadding()),
-            )
     ) {
         if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
             Row(
@@ -133,12 +136,15 @@ fun CalculatorStandard(
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 Result(
+                    screenPadding.copy(end = 0.dp, bottom = 0.dp),
                     modifier = Modifier.weight(1f),
                     vm
                 )
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    modifier = Modifier.fillMaxHeight()
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .padding(screenPadding.copy(start = 0.dp))
                 ) {
                     layout.forEach { item ->
                         Column(
@@ -169,12 +175,15 @@ fun CalculatorStandard(
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 Result(
+                    screenPadding.copy(bottom = 0.dp),
                     modifier = Modifier.weight(1f),
                     vm
                 )
                 Column(
                     verticalArrangement = Arrangement.spacedBy(8.dp),
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(screenPadding.copy(top = 0.dp))
                 ) {
                     layout.forEach { item ->
                         Row(
@@ -219,6 +228,7 @@ class EquationTransformation : OutputTransformation {
 
 @Composable
 private fun Result(
+    screenPadding: PaddingValues,
     modifier: Modifier = Modifier,
     vm: StandardViewModel
 ) {
@@ -227,9 +237,27 @@ private fun Result(
         handleColor = C.colors.accent,
         backgroundColor = C.colors.accent.copy(alpha = 0.4f)
     )
+    val spacing = screenPadding.plus(PaddingValues(start = 12.dp, end = 12.dp))
+        .copy(top = 0.dp, bottom = 0.dp)
+
+    val equationScroll = rememberScrollState()
+    val resultScroll = rememberScrollState()
+
+    var result by remember { mutableStateOf(vm.evaluate()) }
+    println("[$] COMPOSITION")
+
+    LaunchedEffect(vm.equation) {
+        snapshotFlow { vm.equation.text.toString() }
+            .distinctUntilChanged()
+            .collect {
+                result = vm.evaluate()
+                equationScroll.scrollTo(equationScroll.maxValue)
+            }
+    }
 
     Column(
-        modifier = modifier
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         Navigation(
             listOf(
@@ -237,11 +265,16 @@ private fun Result(
                 "Standard",
                 "Scientific",
             ),
+            Modifier.padding(screenPadding)
         )
         Column(
-            modifier = Modifier.fillMaxHeight(),
-            verticalArrangement = Arrangement.Center
+            modifier = Modifier
+                .fillMaxHeight(),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            horizontalAlignment = Alignment.End
         ) {
+
+
             CompositionLocalProvider(
                 LocalTextSelectionColors provides selectionColors
             ) {
@@ -250,17 +283,40 @@ private fun Result(
                         state = vm.equation,
                         modifier = modifier
                             .fillMaxWidth()
-                            .wrapContentHeight()
+                            .weight(1f)
                             .focusRequester(focusRequester),
                         textStyle = largeInter.copy(
                             color = C.colors.onBackground,
-                            textAlign = TextAlign.Center
+                            textAlign = TextAlign.Right
                         ),
                         cursorBrush = SolidColor(C.colors.accent),
-                        outputTransformation = EquationTransformation()
+                        outputTransformation = EquationTransformation(),
+                        scrollState = equationScroll,
+                        decorator = { inner -> // Screen padding is calculated here, only to optimize clickable space.
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(spacing),
+                                contentAlignment = Alignment.BottomEnd
+                            ) {
+                                inner()
+                            }
+                        }
                     )
                 }
             }
+            Text(
+                text = result,
+                style = veryLargeNDot.copy(
+                    color = C.colors.onBackground,
+                    textAlign = TextAlign.Right
+                ),
+                modifier = Modifier
+                    .verticalScroll(resultScroll)
+                    .fillMaxWidth()
+                    .weight(1f)
+                    .padding(spacing)
+            )
         }
     }
 

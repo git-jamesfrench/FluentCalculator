@@ -30,3 +30,9 @@ val largeNDot = TextStyle(
     fontSize = 30.sp,
     baselineShift = BaselineShift(-0.2f)
 )
+
+val veryLargeNDot = TextStyle(
+    fontFamily = ndotFont,
+    fontSize = 55.sp,
+    baselineShift = BaselineShift(-0.2f)
+)

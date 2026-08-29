@@ -54,7 +54,8 @@ private fun interpolate(values: List<Int>, index: Float): Float {
 
 @Composable
 fun Navigation(
-    options: List<String>
+    options: List<String>,
+    modifier: Modifier = Modifier
 ) {
     val textMeasurer: TextMeasurer = rememberTextMeasurer()
     var selectorSize by remember { mutableStateOf(IntSize.Zero) }
@@ -77,7 +78,7 @@ fun Navigation(
     )
 
     Row(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .height(IntrinsicSize.Min)
             .border(1.dp, C.colors.surface, RoundedCornerShape(100))

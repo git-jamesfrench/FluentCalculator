@@ -3,9 +3,11 @@ package fr.jamesfrench.fluentcalculator.viewmodels
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.delete
 import androidx.lifecycle.ViewModel
+import com.ezylang.evalex.Expression
 import fr.jamesfrench.fluentcalculator.classes.Action
 import fr.jamesfrench.fluentcalculator.classes.T
 import fr.jamesfrench.fluentcalculator.utils.getType
+import java.math.BigDecimal
 
 class StandardViewModel : ViewModel() {
     var equation = TextFieldState("")
@@ -69,5 +71,23 @@ class StandardViewModel : ViewModel() {
             }
         }
         return success
+    }
+
+    private fun cleanExpression(equation: String): String {
+        return equation
+    }
+
+    fun evaluate(): String {
+        val cleanedExpression = cleanExpression(equation.text.toString())
+        val expression = Expression(cleanedExpression)
+        var result = BigDecimal(0)
+
+        try {
+            result = expression.evaluate().numberValue
+        } catch (e: Exception) {
+            println(e)
+        }
+
+        return result.toString()
     }
 }
