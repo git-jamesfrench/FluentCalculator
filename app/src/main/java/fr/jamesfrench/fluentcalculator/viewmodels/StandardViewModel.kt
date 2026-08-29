@@ -2,6 +2,7 @@ package fr.jamesfrench.fluentcalculator.viewmodels
 
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.delete
+import androidx.compose.foundation.text.input.insert
 import androidx.lifecycle.ViewModel
 import com.ezylang.evalex.Expression
 import fr.jamesfrench.fluentcalculator.classes.Action
@@ -25,8 +26,8 @@ class StandardViewModel : ViewModel() {
                                 toString().getType(selection.min - 1) in listOf(T.Empty, T.Operator)
 
                     when {
-                        isOperatorAndFirstCharacter -> append('0')
-                        isAloneDot -> append('0')
+                        isOperatorAndFirstCharacter -> insert(selection.min, "0")
+                        isAloneDot -> insert(selection.min, "0")
                     }
 
 
