@@ -22,7 +22,7 @@ import fr.jamesfrench.fluentcalculator.ui.theme.C
 @Composable
 fun RoundButton(
     modifier: Modifier = Modifier,
-    onClick: () -> Unit,
+    onClick: () -> Boolean,
     content: @Composable () -> Unit,
 ) {
     val interactionSource = remember { MutableInteractionSource() }
@@ -45,8 +45,9 @@ fun RoundButton(
                 indication = null,
                 interactionSource = interactionSource,
             ) {
-                haptic.performHapticFeedback(HapticFeedbackType.Confirm)
-                onClick()
+                if (onClick()) {
+                    haptic.performHapticFeedback(HapticFeedbackType.Confirm)
+                }
             }
             .padding(16.dp)
 

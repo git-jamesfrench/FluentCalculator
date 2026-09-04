@@ -7,6 +7,7 @@ val LighterNothingRed = Color(0xFF860C20)
 
 val White = Color(0xFFFFFFFF)
 val LighterWhite = Color(0xFFA8A8A8)
+val Gray = Color(0xFF868686)
 
 val Black = Color(0xFF000000)
 val FaintDarkGray = Color(0xFF19191a)

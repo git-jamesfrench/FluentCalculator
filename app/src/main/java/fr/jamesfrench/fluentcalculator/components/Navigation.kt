@@ -59,7 +59,7 @@ fun Navigation(
 ) {
     val textMeasurer: TextMeasurer = rememberTextMeasurer()
     var selectorSize by remember { mutableStateOf(IntSize.Zero) }
-    var selected by remember { mutableFloatStateOf(0f) }
+    var selected by remember { mutableFloatStateOf(1f) }
     val lengths = mutableListOf(0).also { list ->
         options.forEach { string ->
             val width = textMeasurer.measure(string, TextStyle(fontSize = 25.sp)).size.width
@@ -84,8 +84,13 @@ fun Navigation(
             .border(1.dp, C.colors.surface, RoundedCornerShape(100))
     ) {
         // Button 1
-        RoundButton(onClick = { selected -= 1 }) {
-            Icon(LucideCog, stringResource(R.string.settings_description), size = 24.dp)
+        RoundButton(onClick = { return@RoundButton false }) {
+            Icon(
+                LucideCog,
+                stringResource(R.string.settings_description),
+                size = 24.dp,
+                color = C.colors.onBackgroundFaint
+            )
         }
         // Tabs
         Box(
@@ -142,8 +147,13 @@ fun Navigation(
             )
         }
         // Button 2
-        RoundButton(onClick = { selected += 1 }) {
-            Icon(LucideHistory, stringResource(R.string.history_icon), size = 24.dp)
+        RoundButton(onClick = { return@RoundButton false }) {
+            Icon(
+                LucideHistory,
+                stringResource(R.string.history_icon),
+                size = 24.dp,
+                color = C.colors.onBackgroundFaint
+            )
         }
     }
 }
