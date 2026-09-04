@@ -262,7 +262,7 @@ class EquationTransformation(
                         text.count { it == T.CloseParentheses.value }
             )
         ) {
-            insert(length, T.CloseParentheses.value.toString())
+            insert(length, " " + T.CloseParentheses.value.toString())
             addStyle(SpanStyle(autoAddedColor), length - 1, length)
         }
     }
@@ -328,14 +328,14 @@ private fun Result(
                             .weight(1f)
                             .focusRequester(focusRequester),
                         textStyle = largeInter.copy(
-                            color = C.colors.onBackground,
+                            color = C.colors.onBackgroundFaint1,
                             textAlign = TextAlign.Right
                         ),
                         cursorBrush = SolidColor(C.colors.accent),
                         outputTransformation = EquationTransformation(
-                            C.colors.onBackgroundVeryFaint,
+                            C.colors.onBackgroundFaint3,
                             C.colors.error,
-                            C.colors.onBackgroundFaint
+                            C.colors.onBackgroundFaint2
                         ),
                         scrollState = equationScroll,
                         decorator = { inner -> // Screen padding is calculated here, only to optimize clickable space.

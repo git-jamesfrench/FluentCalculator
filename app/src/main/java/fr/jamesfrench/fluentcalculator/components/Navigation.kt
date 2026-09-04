@@ -89,7 +89,7 @@ fun Navigation(
                 LucideCog,
                 stringResource(R.string.settings_description),
                 size = 24.dp,
-                color = C.colors.onBackgroundFaint
+                color = C.colors.onBackgroundFaint2
             )
         }
         // Tabs
@@ -152,7 +152,7 @@ fun Navigation(
                 LucideHistory,
                 stringResource(R.string.history_icon),
                 size = 24.dp,
-                color = C.colors.onBackgroundFaint
+                color = C.colors.onBackgroundFaint2
             )
         }
     }

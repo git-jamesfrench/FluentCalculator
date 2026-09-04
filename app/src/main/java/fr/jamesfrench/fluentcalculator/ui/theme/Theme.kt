@@ -13,8 +13,9 @@ import androidx.core.view.WindowCompat
 data class FluentCalculatorColors(
     val background: Color,
     val onBackground: Color,
-    val onBackgroundFaint: Color,
-    val onBackgroundVeryFaint: Color,
+    val onBackgroundFaint1: Color,
+    val onBackgroundFaint2: Color,
+    val onBackgroundFaint3: Color,
 
     val surface: Color,
     val onSurface: Color,
@@ -39,8 +40,9 @@ data class FluentCalculatorColors(
 private val DarkColorScheme = FluentCalculatorColors(
     background = Black,
     onBackground = White,
-    onBackgroundFaint = LighterWhite,
-    onBackgroundVeryFaint = Gray,
+    onBackgroundFaint1 = LighterWhite,
+    onBackgroundFaint2 = LightGray,
+    onBackgroundFaint3 = Gray,
 
     surface = DarkGray,
     onSurface = White,
@@ -50,7 +52,7 @@ private val DarkColorScheme = FluentCalculatorColors(
     onNeutral = White,
 
     inverse = White,
-    activeInverse = LighterWhite,
+    activeInverse = LightGray,
     onInverse = Black,
 
     accent = NothingRed,
