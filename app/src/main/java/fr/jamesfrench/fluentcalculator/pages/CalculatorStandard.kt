@@ -39,8 +39,10 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.ezylang.evalex.BaseException
 import fr.jamesfrench.fluentcalculator.classes.Action
 import fr.jamesfrench.fluentcalculator.classes.ButtonData
+import fr.jamesfrench.fluentcalculator.classes.EvaluateResult
 import fr.jamesfrench.fluentcalculator.classes.T
 import fr.jamesfrench.fluentcalculator.components.BigButton
 import fr.jamesfrench.fluentcalculator.components.BigButtonVariant
@@ -58,8 +60,8 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 private val ButtonsVertical = listOf(
     listOf(
         ButtonData("AC", BigButtonVariant.Inverse, Action.ClearAll),
-        ButtonData("(", BigButtonVariant.Accent, Action.Append, "("),
-        ButtonData(")", BigButtonVariant.Accent, Action.Append, ")"),
+        ButtonData("^", BigButtonVariant.Accent, Action.Append, "^"),
+        ButtonData("(", BigButtonVariant.Accent, Action.AddParentheses),
         ButtonData("÷", BigButtonVariant.Accent, Action.Append, "/"),
     ),
     listOf(
@@ -95,7 +97,7 @@ private val ButtonsHorizontal = listOf(
         ButtonData("(", BigButtonVariant.Accent, Action.AddParentheses),
     ),
     listOf(
-        ButtonData("%", BigButtonVariant.Accent, Action.Append, "%"),
+        ButtonData("^", BigButtonVariant.Accent, Action.Append, "^"),
         ButtonData("×", BigButtonVariant.Accent, Action.Append, "*"),
         ButtonData("+", BigButtonVariant.Accent, Action.Append, "+"),
         ButtonData("=", BigButtonVariant.Accent, Action.Equal),
@@ -157,7 +159,9 @@ fun CalculatorStandard(
                         ) {
                             item.forEach { item ->
                                 BigButton(
-                                    if (item.action == Action.AddParentheses) "(" else item.text,
+                                    if (item.action == Action.AddParentheses)
+                                        (if (vm.closedParentheses) T.CloseParentheses.value else T.OpenParentheses.value).toString() else
+                                        item.text,
                                     item.variant,
                                     modifier = Modifier
                                         .weight(1f)
@@ -196,7 +200,9 @@ fun CalculatorStandard(
                         ) {
                             item.forEach { item ->
                                 BigButton(
-                                    if (item.action == Action.AddParentheses) "(" else item.text,
+                                    if (item.action == Action.AddParentheses)
+                                        (if (vm.closedParentheses) T.CloseParentheses.value else T.OpenParentheses.value).toString() else
+                                        item.text,
                                     item.variant,
                                     modifier = Modifier
                                         .weight(1f)
@@ -218,7 +224,8 @@ fun CalculatorStandard(
 class EquationTransformation(
     private val disabledColor: Color = Color.Black,
     private val errorColor: Color = Color.Black,
-    private val autoAddedColor: Color = Color.Black
+    private val autoAddedColor: Color = Color.Black,
+    private val error: Exception? = null
 ) : OutputTransformation {
     override fun TextFieldBuffer.transformOutput() {
         // Validation
@@ -255,6 +262,27 @@ class EquationTransformation(
                 i += 1
             }
         }
+
+        println(error)
+        if (error is BaseException) {
+            val start = error.startPosition.coerceIn(0, text.lastIndex)
+            var end = error.endPosition.coerceIn(start, text.lastIndex)
+            if (start == end) {
+                end += 1
+            }
+            addStyle(
+                SpanStyle(errorColor),
+                start,
+                end
+            )
+        } else if (error != null) {
+            addStyle(
+                SpanStyle(errorColor),
+                0,
+                text.lastIndex + 1
+            )
+        }
+
         repeat( // Close unclosed parentheses
             maxOf(
                 0,
@@ -285,7 +313,7 @@ private fun Result(
     val equationScroll = rememberScrollState()
     val resultScroll = rememberScrollState()
 
-    var result by remember { mutableStateOf(vm.evaluate()) }
+    var result by remember { mutableStateOf(EvaluateResult("", null)) }
     println("[$] COMPOSITION")
 
     LaunchedEffect(vm.equation) {
@@ -335,7 +363,8 @@ private fun Result(
                         outputTransformation = EquationTransformation(
                             C.colors.onBackgroundFaint3,
                             C.colors.error,
-                            C.colors.onBackgroundFaint2
+                            C.colors.onBackgroundFaint2,
+                            result.error
                         ),
                         scrollState = equationScroll,
                         decorator = { inner -> // Screen padding is calculated here, only to optimize clickable space.
@@ -364,7 +393,7 @@ private fun Result(
 //                    .padding(spacing)
 //            )
             Text(
-                text = if (result.error != null && vm.showErrorEquation) "⚠ ${result.error?.message}" else result.resultString,
+                text = if (result.error != null) "⚠ ${result.error?.message}" else result.resultString,
                 style = veryLargeNDot.copy(
                     color = C.colors.onBackground,
                     textAlign = TextAlign.Right,

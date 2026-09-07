@@ -7,22 +7,38 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import com.ezylang.evalex.Expression
+import com.ezylang.evalex.config.ExpressionConfiguration
 import fr.jamesfrench.fluentcalculator.classes.Action
 import fr.jamesfrench.fluentcalculator.classes.ButtonResponse
 import fr.jamesfrench.fluentcalculator.classes.EvaluateResult
 import fr.jamesfrench.fluentcalculator.classes.T
 import fr.jamesfrench.fluentcalculator.utils.isValidOperator
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import java.util.concurrent.Callable
+import java.util.concurrent.ExecutionException
+import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
+import java.util.concurrent.TimeoutException
 
 class StandardViewModel : ViewModel() {
+    private val configuration = ExpressionConfiguration.builder()
+        .maxRecursionDepth(2000)
+        .build()
     var equation = TextFieldState("")
     var showErrorEquation by mutableStateOf(false)
+    var closedParentheses by mutableStateOf(false)
 
     fun executeKeyboardAction(action: Action, value: String = ""): ButtonResponse {
         var success = ButtonResponse(false, 0)
         equation.edit {
             when (action) {
-                Action.Append -> {
-
+                Action.Append, Action.AddParentheses -> {
+                    var value = value
+                    if (action == Action.AddParentheses) {
+                        value =
+                            (if (closedParentheses) T.CloseParentheses.value else T.OpenParentheses.value).toString()
+                    }
 
                     replace(selection.min, selection.max, value)
                     placeCursorBeforeCharAt(selection.max)
@@ -63,11 +79,17 @@ class StandardViewModel : ViewModel() {
                     println("[$] AT INDEX MIN: ${this.toString().getOrElse(selection.min) { '⚠' }}")
                     println("[$] AT INDEX MAX: ${this.toString().getOrElse(selection.max) { '⚠' }}")
                 }
-
-                else -> {}
             }
         }
+        setClosedParentheses()
         return success
+    }
+
+    fun setClosedParentheses() {
+        val ratioParentheses =
+            equation.text.count { it == T.OpenParentheses.value } - equation.text.count { it == T.CloseParentheses.value }
+        closedParentheses =
+            ratioParentheses > 0 && equation.text.getOrNull(equation.selection.min - 1) in T.Number.values + T.CloseParentheses.value
     }
 
     private data class Indexes(val start: Int, val end: Int)
@@ -111,21 +133,33 @@ class StandardViewModel : ViewModel() {
         return text
     }
 
-    fun evaluate(): EvaluateResult {
+    @Suppress("BlockingMethodInNonBlockingContext")
+    suspend fun evaluate(): EvaluateResult = withContext(Dispatchers.Default) {
         val cleanedExpression = cleanExpression(equation.text.toString())
-        val expression = Expression(cleanedExpression)
-        var result: String?
+        val expression = Expression(cleanedExpression, configuration)
 
         if (cleanedExpression.isEmpty()) {
-            return EvaluateResult("", null)
+            return@withContext EvaluateResult("", null)
         }
 
+        val executor = Executors.newSingleThreadExecutor()
         try {
-            result = expression.evaluate().numberValue.toString()
+            val future = executor.submit(Callable {
+                expression.evaluate().numberValue.toString()
+            })
 
-            return EvaluateResult(result, null)
-        } catch (e: Exception) {
-            return EvaluateResult("", e)
+            try {
+                val result = future.get(200, TimeUnit.MILLISECONDS)
+
+                return@withContext EvaluateResult(result, null)
+            } catch (_: TimeoutException) {
+                future.cancel(true)
+                return@withContext EvaluateResult("", TimeoutException("Equation timeout"))
+            } catch (e: ExecutionException) {
+                return@withContext EvaluateResult("", e.cause as Exception?)
+            }
+        } finally {
+            executor.shutdownNow()
         }
     }
 }
