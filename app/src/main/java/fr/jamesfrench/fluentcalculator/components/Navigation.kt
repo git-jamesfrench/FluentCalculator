@@ -87,7 +87,7 @@ fun Navigation(
         RoundButton(onClick = { return@RoundButton false }) {
             Icon(
                 LucideCog,
-                stringResource(R.string.settings_description),
+                stringResource(R.string.settings),
                 size = 24.dp,
                 color = C.colors.onBackgroundFaint2
             )
@@ -150,7 +150,7 @@ fun Navigation(
         RoundButton(onClick = { return@RoundButton false }) {
             Icon(
                 LucideHistory,
-                stringResource(R.string.history_icon),
+                stringResource(R.string.history),
                 size = 24.dp,
                 color = C.colors.onBackgroundFaint2
             )
