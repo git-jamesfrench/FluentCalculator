@@ -39,7 +39,6 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.ezylang.evalex.BaseException
 import fr.jamesfrench.fluentcalculator.classes.Action
 import fr.jamesfrench.fluentcalculator.classes.ButtonData
 import fr.jamesfrench.fluentcalculator.classes.EvaluateResult
@@ -263,26 +262,6 @@ class EquationTransformation(
             }
         }
 
-        println(error)
-        if (error is BaseException) {
-            val start = error.startPosition.coerceIn(0, text.lastIndex)
-            var end = error.endPosition.coerceIn(start, text.lastIndex)
-            if (start == end) {
-                end += 1
-            }
-            addStyle(
-                SpanStyle(errorColor),
-                start,
-                end
-            )
-        } else if (error != null) {
-            addStyle(
-                SpanStyle(errorColor),
-                0,
-                text.lastIndex + 1
-            )
-        }
-
         repeat( // Close unclosed parentheses
             maxOf(
                 0,
@@ -392,6 +371,19 @@ private fun Result(
 //                    .weight(1f)
 //                    .padding(spacing)
 //            )
+            Text(
+                text = result.error?.message.toString(),
+                style = veryLargeNDot.copy(
+                    color = C.colors.onBackground,
+                    textAlign = TextAlign.Right,
+                    fontSize = (if (result.error == null) 55.sp else 30.sp)
+                ),
+                modifier = Modifier
+                    .verticalScroll(resultScroll)
+                    .fillMaxWidth()
+                    .weight(1f)
+                    .padding(spacing + PaddingValues(top = (if (result.error != null) 15.dp else 0.dp)))
+            )
             Text(
                 text = if (result.error != null) "⚠ ${result.error?.message}" else result.resultString,
                 style = veryLargeNDot.copy(
