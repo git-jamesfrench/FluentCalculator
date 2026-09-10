@@ -67,7 +67,7 @@ private val ButtonsVertical = listOf(
         ButtonData("4", BigButtonVariant.Gray, Action.Append, "4"),
         ButtonData("5", BigButtonVariant.Gray, Action.Append, "5"),
         ButtonData("6", BigButtonVariant.Gray, Action.Append, "6"),
-        ButtonData("–", BigButtonVariant.Accent, Action.Append, "-"),
+        ButtonData("−", BigButtonVariant.Accent, Action.Append, "-"),
     ),
     listOf(
         ButtonData("1", BigButtonVariant.Gray, Action.Append, "1"),
@@ -86,7 +86,7 @@ private val ButtonsHorizontal = listOf(
     listOf(
         ButtonData("AC", BigButtonVariant.Inverse, Action.ClearAll),
         ButtonData("÷", BigButtonVariant.Accent, Action.Append, "/"),
-        ButtonData("–", BigButtonVariant.Accent, Action.Append, "-"),
+        ButtonData("−", BigButtonVariant.Accent, Action.Append, "-"),
         ButtonData("(", BigButtonVariant.Accent, Action.AddParentheses),
     ),
     listOf(
@@ -286,7 +286,7 @@ private fun Result(
                             .weight(1f)
                             .focusRequester(focusRequester),
                         textStyle = largeInter.copy(
-                            color = C.colors.onBackground,
+                            color = C.colors.onBackgroundLight,
                             textAlign = TextAlign.Right
                         ),
                         cursorBrush = SolidColor(C.colors.accent),
