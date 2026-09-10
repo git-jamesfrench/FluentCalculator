@@ -2,38 +2,48 @@ package fr.jamesfrench.fluentcalculator.viewmodels
 
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.delete
-import androidx.compose.foundation.text.input.insert
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import com.ezylang.evalex.Expression
+import com.ezylang.evalex.config.ExpressionConfiguration
 import fr.jamesfrench.fluentcalculator.classes.Action
+import fr.jamesfrench.fluentcalculator.classes.ButtonResponse
+import fr.jamesfrench.fluentcalculator.classes.EvaluateResult
 import fr.jamesfrench.fluentcalculator.classes.T
-import fr.jamesfrench.fluentcalculator.utils.getType
-import java.math.BigDecimal
+import fr.jamesfrench.fluentcalculator.utils.isValidOperator
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import java.util.concurrent.Callable
+import java.util.concurrent.ExecutionException
+import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
+import java.util.concurrent.TimeoutException
 
 class StandardViewModel : ViewModel() {
+    private val configuration = ExpressionConfiguration.builder()
+        .maxRecursionDepth(2000)
+        .build()
     var equation = TextFieldState("")
+    var showErrorEquation by mutableStateOf(false)
+    var closedParentheses by mutableStateOf(false)
 
-    fun executeKeyboardAction(action: Action, value: String = ""): Boolean {
-        var success = false
+    fun executeKeyboardAction(action: Action, value: String = ""): ButtonResponse {
+        var success = ButtonResponse(false, 0)
         equation.edit {
             when (action) {
-                Action.Append -> {
-                    val isOperatorAndFirstCharacter =
-                        value[0] in T.Operator.values &&
-                                toString().getType(selection.min - 1) == T.Empty
-                    val isAloneDot =
-                        value[0] == '.' &&
-                                toString().getType(selection.min - 1) in listOf(T.Empty, T.Operator)
-
-                    when {
-                        isOperatorAndFirstCharacter -> insert(selection.min, "0")
-                        isAloneDot -> insert(selection.min, "0")
+                Action.Append, Action.AddParentheses -> {
+                    var value = value
+                    if (action == Action.AddParentheses) {
+                        value =
+                            (if (closedParentheses) T.CloseParentheses.value else T.OpenParentheses.value).toString()
                     }
-
 
                     replace(selection.min, selection.max, value)
                     placeCursorBeforeCharAt(selection.max)
-                    success = true
+                    success = ButtonResponse(true, 0)
+                    showErrorEquation = false
                 }
 
                 Action.Backspace -> {
@@ -42,53 +52,114 @@ class StandardViewModel : ViewModel() {
                             if (selection.length > 0) 0 else 1 // Offset if no selection to remove previous character
 
                         delete(selection.min - offset, selection.max)
-                        success = true
+                        success = ButtonResponse(true, 0)
                     }
                 }
 
                 Action.ClearAll -> {
                     if (length > 0) {
                         delete(0, length)
-                        success = true
+                        success = ButtonResponse(true, 0)
                     }
                 }
 
                 Action.Equal -> {
+                    success = ButtonResponse(true, 1)
+                    showErrorEquation = true
                     println("[$] ${"-".repeat(20)} SELECTION REPORT ${"-".repeat(20)}")
                     println(
                         "[$] ${
-                            StringBuilder(this.originalText)
+                            StringBuilder(this.toString())
                                 .insert(selection.min, "[")
                                 .insert(selection.max + 1, "]")
                         }"
                     )
                     println("[$] SELECT INDEX: ${selection.min} -> ${selection.max}")
                     println("[$] MAX INDEX: 0 -> ${maxOf(length - 1, 0)}")
-                    println("[$] AT INDEX MIN: ${this.originalText.getOrElse(selection.min) { '⚠' }}")
-                    println("[$] AT INDEX MAX: ${this.originalText.getOrElse(selection.max) { '⚠' }}")
+                    println("[$] AT INDEX MIN: ${this.toString().getOrElse(selection.min) { '⚠' }}")
+                    println("[$] AT INDEX MAX: ${this.toString().getOrElse(selection.max) { '⚠' }}")
                 }
-
-                else -> {}
             }
         }
+        setClosedParentheses()
         return success
     }
 
-    private fun cleanExpression(equation: String): String {
-        return equation
+    fun setClosedParentheses() {
+        val ratioParentheses =
+            equation.text.count { it == T.OpenParentheses.value } - equation.text.count { it == T.CloseParentheses.value }
+        closedParentheses =
+            ratioParentheses > 0 && equation.text.getOrNull(equation.selection.min - 1) in T.Number.values + T.CloseParentheses.value
     }
 
-    fun evaluate(): String {
-        val cleanedExpression = cleanExpression(equation.text.toString())
-        val expression = Expression(cleanedExpression)
-        var result = BigDecimal(0)
+    private data class Indexes(val start: Int, val end: Int)
 
-        try {
-            result = expression.evaluate().numberValue
-        } catch (e: Exception) {
-            println(e)
+    fun cleanExpression(text: String): String {
+        val toRemove = mutableListOf<Indexes>()
+        var text = text
+        var i = 0
+
+        while (true) {
+            when (text.getOrNull(i)) {
+                in T.Operator.values -> {
+                    val operation = text.isValidOperator(i)
+
+                    if (!operation.isReady) {
+                        toRemove.add(0, Indexes(i, operation.endIndex))
+                    }
+
+                    i = operation.endIndex
+                }
+            }
+            if (i >= text.lastIndex) {
+                break
+            } else {
+                i += 1
+            }
+        }
+        for (indexes in toRemove) {
+            text = text.removeRange(indexes.start, indexes.end)
+        }
+        repeat(
+            maxOf(
+                0,
+                text.count { it == T.OpenParentheses.value } -
+                        text.count { it == T.CloseParentheses.value }
+            )
+        ) {
+            text += T.CloseParentheses.value
         }
 
-        return result.toString()
+        return text
+    }
+
+    @Suppress("BlockingMethodInNonBlockingContext")
+    suspend fun evaluate(): EvaluateResult = withContext(Dispatchers.Default) {
+        val cleanedExpression = cleanExpression(equation.text.toString())
+        val expression = Expression(cleanedExpression, configuration)
+
+        if (cleanedExpression.isEmpty()) {
+            return@withContext EvaluateResult("", null)
+        }
+
+        val executor = Executors.newSingleThreadExecutor()
+        try {
+            val future = executor.submit(Callable {
+                expression.evaluate().numberValue.toString()
+            })
+
+            try {
+                val result = future.get(200, TimeUnit.MILLISECONDS)
+
+                return@withContext EvaluateResult(result, null)
+            } catch (_: TimeoutException) {
+                future.cancel(true)
+                return@withContext EvaluateResult("", TimeoutException("Equation timeout"))
+            } catch (e: ExecutionException) {
+                return@withContext EvaluateResult("", e.cause as Exception?)
+            }
+        } finally {
+            executor.shutdownNow()
+        }
     }
 }

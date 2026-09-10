@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Fluent Calculator</string>
-    <string name="settings_description">Icône paramètres</string>
-    <string name="history_icon">Icône historique</string>
+    <string name="settings">Icône paramètres</string>
+    <string name="history">Icône historique</string>
+    <string name="error_division_by_zero">Division par zéro</string>
 </resources>

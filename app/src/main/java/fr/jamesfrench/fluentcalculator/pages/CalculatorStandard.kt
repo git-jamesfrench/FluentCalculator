@@ -16,6 +16,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.input.OutputTransformation
 import androidx.compose.foundation.text.input.TextFieldBuffer
+import androidx.compose.foundation.text.input.insert
 import androidx.compose.foundation.text.selection.LocalTextSelectionColors
 import androidx.compose.foundation.text.selection.TextSelectionColors
 import androidx.compose.foundation.verticalScroll
@@ -31,12 +32,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import fr.jamesfrench.fluentcalculator.classes.Action
 import fr.jamesfrench.fluentcalculator.classes.ButtonData
+import fr.jamesfrench.fluentcalculator.classes.EvaluateResult
 import fr.jamesfrench.fluentcalculator.classes.T
 import fr.jamesfrench.fluentcalculator.components.BigButton
 import fr.jamesfrench.fluentcalculator.components.BigButtonVariant
@@ -47,13 +52,14 @@ import fr.jamesfrench.fluentcalculator.ui.theme.largeInter
 import fr.jamesfrench.fluentcalculator.ui.theme.veryLargeNDot
 import fr.jamesfrench.fluentcalculator.utils.DisableSoftKeyboard
 import fr.jamesfrench.fluentcalculator.utils.copy
+import fr.jamesfrench.fluentcalculator.utils.isValidOperator
 import fr.jamesfrench.fluentcalculator.viewmodels.StandardViewModel
 import kotlinx.coroutines.flow.distinctUntilChanged
 
 private val ButtonsVertical = listOf(
     listOf(
         ButtonData("AC", BigButtonVariant.Inverse, Action.ClearAll),
-        ButtonData("%", BigButtonVariant.Accent, Action.Append, "%"),
+        ButtonData("^", BigButtonVariant.Accent, Action.Append, "^"),
         ButtonData("(", BigButtonVariant.Accent, Action.AddParentheses),
         ButtonData("÷", BigButtonVariant.Accent, Action.Append, "/"),
     ),
@@ -67,7 +73,7 @@ private val ButtonsVertical = listOf(
         ButtonData("4", BigButtonVariant.Gray, Action.Append, "4"),
         ButtonData("5", BigButtonVariant.Gray, Action.Append, "5"),
         ButtonData("6", BigButtonVariant.Gray, Action.Append, "6"),
-        ButtonData("−", BigButtonVariant.Accent, Action.Append, "-"),
+        ButtonData("–", BigButtonVariant.Accent, Action.Append, "-"),
     ),
     listOf(
         ButtonData("1", BigButtonVariant.Gray, Action.Append, "1"),
@@ -86,11 +92,11 @@ private val ButtonsHorizontal = listOf(
     listOf(
         ButtonData("AC", BigButtonVariant.Inverse, Action.ClearAll),
         ButtonData("÷", BigButtonVariant.Accent, Action.Append, "/"),
-        ButtonData("−", BigButtonVariant.Accent, Action.Append, "-"),
+        ButtonData("–", BigButtonVariant.Accent, Action.Append, "-"),
         ButtonData("(", BigButtonVariant.Accent, Action.AddParentheses),
     ),
     listOf(
-        ButtonData("%", BigButtonVariant.Accent, Action.Append, "%"),
+        ButtonData("^", BigButtonVariant.Accent, Action.Append, "^"),
         ButtonData("×", BigButtonVariant.Accent, Action.Append, "*"),
         ButtonData("+", BigButtonVariant.Accent, Action.Append, "+"),
         ButtonData("=", BigButtonVariant.Accent, Action.Equal),
@@ -152,7 +158,9 @@ fun CalculatorStandard(
                         ) {
                             item.forEach { item ->
                                 BigButton(
-                                    if (item.action == Action.AddParentheses) "(" else item.text,
+                                    if (item.action == Action.AddParentheses)
+                                        (if (vm.closedParentheses) T.CloseParentheses.value else T.OpenParentheses.value).toString() else
+                                        item.text,
                                     item.variant,
                                     modifier = Modifier
                                         .weight(1f)
@@ -191,7 +199,9 @@ fun CalculatorStandard(
                         ) {
                             item.forEach { item ->
                                 BigButton(
-                                    if (item.action == Action.AddParentheses) "(" else item.text,
+                                    if (item.action == Action.AddParentheses)
+                                        (if (vm.closedParentheses) T.CloseParentheses.value else T.OpenParentheses.value).toString() else
+                                        item.text,
                                     item.variant,
                                     modifier = Modifier
                                         .weight(1f)
@@ -210,18 +220,57 @@ fun CalculatorStandard(
     }
 }
 
-class EquationTransformation : OutputTransformation {
+class EquationTransformation(
+    private val disabledColor: Color = Color.Black,
+    private val errorColor: Color = Color.Black,
+    private val autoAddedColor: Color = Color.Black,
+    private val error: Exception? = null
+) : OutputTransformation {
     override fun TextFieldBuffer.transformOutput() {
-        for (i in 0..<length) {
-            val char = this.charAt(i)
-            if (char in T.Operator.values) {
-                when (char) {
+        // Validation
+        val text = toString()
+        var i = 0
+
+        for (i in text.indices) {
+            if (text[i] in T.Operator.values) {
+                when (text[i]) {
                     '-' -> replace(i, i + 1, "−")
                     '*' -> replace(i, i + 1, "×")
                     '/' -> replace(i, i + 1, "÷")
                 }
             }
-            //replace(i, i+1, "•") // Easter-egg
+        }
+
+        while (true) {
+            when (text.getOrNull(i)) {
+                in T.Operator.values -> {
+                    val operation = text.isValidOperator(i)
+
+                    if (!operation.isReady) {
+                        addStyle(SpanStyle(disabledColor), i, operation.endIndex)
+                    } else if (!operation.isValid) {
+                        addStyle(SpanStyle(errorColor), i, operation.endIndex)
+                    }
+
+                    i = operation.endIndex
+                }
+            }
+            if (i >= text.lastIndex) {
+                break
+            } else {
+                i += 1
+            }
+        }
+
+        repeat( // Close unclosed parentheses
+            maxOf(
+                0,
+                text.count { it == T.OpenParentheses.value } -
+                        text.count { it == T.CloseParentheses.value }
+            )
+        ) {
+            insert(length, " " + T.CloseParentheses.value.toString())
+            addStyle(SpanStyle(autoAddedColor), length - 1, length)
         }
     }
 }
@@ -243,7 +292,7 @@ private fun Result(
     val equationScroll = rememberScrollState()
     val resultScroll = rememberScrollState()
 
-    var result by remember { mutableStateOf(vm.evaluate()) }
+    var result by remember { mutableStateOf(EvaluateResult("", null)) }
     println("[$] COMPOSITION")
 
     LaunchedEffect(vm.equation) {
@@ -286,11 +335,16 @@ private fun Result(
                             .weight(1f)
                             .focusRequester(focusRequester),
                         textStyle = largeInter.copy(
-                            color = C.colors.onBackgroundLight,
+                            color = C.colors.onBackgroundFaint1,
                             textAlign = TextAlign.Right
                         ),
                         cursorBrush = SolidColor(C.colors.accent),
-                        outputTransformation = EquationTransformation(),
+                        outputTransformation = EquationTransformation(
+                            C.colors.onBackgroundFaint3,
+                            C.colors.error,
+                            C.colors.onBackgroundFaint2,
+                            result.error
+                        ),
                         scrollState = equationScroll,
                         decorator = { inner -> // Screen padding is calculated here, only to optimize clickable space.
                             Box(
@@ -305,17 +359,43 @@ private fun Result(
                     )
                 }
             }
+//            Text(
+//                text = vm.cleanExpression(vm.equation.text.toString()),
+//                style = veryLargeNDot.copy(
+//                    color = C.colors.onBackground,
+//                    textAlign = TextAlign.Right
+//                ),
+//                modifier = Modifier
+//                    .verticalScroll(resultScroll)
+//                    .fillMaxWidth()
+//                    .weight(1f)
+//                    .padding(spacing)
+//            )
             Text(
-                text = result,
+                text = result.error?.message.toString(),
                 style = veryLargeNDot.copy(
                     color = C.colors.onBackground,
-                    textAlign = TextAlign.Right
+                    textAlign = TextAlign.Right,
+                    fontSize = (if (result.error == null) 55.sp else 30.sp)
                 ),
                 modifier = Modifier
                     .verticalScroll(resultScroll)
                     .fillMaxWidth()
                     .weight(1f)
-                    .padding(spacing)
+                    .padding(spacing + PaddingValues(top = (if (result.error != null) 15.dp else 0.dp)))
+            )
+            Text(
+                text = if (result.error != null) "⚠ ${result.error?.message}" else result.resultString,
+                style = veryLargeNDot.copy(
+                    color = C.colors.onBackground,
+                    textAlign = TextAlign.Right,
+                    fontSize = (if (result.error == null) 55.sp else 30.sp)
+                ),
+                modifier = Modifier
+                    .verticalScroll(resultScroll)
+                    .fillMaxWidth()
+                    .weight(1f)
+                    .padding(spacing + PaddingValues(top = (if (result.error != null) 15.dp else 0.dp)))
             )
         }
     }

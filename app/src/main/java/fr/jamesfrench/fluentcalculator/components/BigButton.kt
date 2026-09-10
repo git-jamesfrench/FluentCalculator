@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
@@ -21,9 +22,13 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.unit.dp
+import fr.jamesfrench.fluentcalculator.classes.ButtonResponse
 import fr.jamesfrench.fluentcalculator.ui.theme.C
 import fr.jamesfrench.fluentcalculator.ui.theme.largeInter
 import fr.jamesfrench.fluentcalculator.ui.theme.largeNDot
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlin.time.Duration.Companion.milliseconds
 
 enum class BigButtonVariant {
     Gray,
@@ -36,11 +41,12 @@ fun BigButton(
     text: String,
     variant: BigButtonVariant,
     modifier: Modifier = Modifier,
-    onClick: () -> Boolean,
+    onClick: () -> ButtonResponse,
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed = interactionSource.collectIsPressedAsState().value
     val haptic = LocalHapticFeedback.current
+    val scope = rememberCoroutineScope()
 
     val color by animateColorAsState(
         if (isPressed) when (variant) {
@@ -77,8 +83,23 @@ fun BigButton(
                 indication = null,
                 interactionSource = interactionSource,
             ) {
-                if (onClick()) {
-                    haptic.performHapticFeedback(HapticFeedbackType.Confirm)
+                val click = onClick()
+                if (click.vibrate) {
+                    when (click.vibrationType) {
+                        0 -> {
+                            haptic.performHapticFeedback(HapticFeedbackType.Confirm)
+                        }
+
+                        1 -> {
+                            scope.launch {
+                                haptic.performHapticFeedback(HapticFeedbackType.Confirm)
+                                delay(100.milliseconds)
+                                haptic.performHapticFeedback(HapticFeedbackType.Confirm)
+                            }
+                        }
+
+                        else -> {}
+                    }
                 }
             },
         contentAlignment = Alignment.Center

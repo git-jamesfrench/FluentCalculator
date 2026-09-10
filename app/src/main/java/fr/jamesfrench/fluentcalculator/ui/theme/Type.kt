@@ -23,6 +23,7 @@ val mediumInter = TextStyle(
 val largeInter = TextStyle(
     fontFamily = interFont,
     fontSize = 30.sp,
+    fontFeatureSettings = "\"case\" 1"
 )
 
 val largeNDot = TextStyle(

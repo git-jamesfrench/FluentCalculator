@@ -1,5 +1,8 @@
 <resources>
     <string name="app_name">Fluent Calculator</string>
-    <string name="settings_description">Settings Icon</string>
-    <string name="history_icon">History Icon</string>
+    <string name="settings">Settings</string>
+    <string name="history">History</string>
+    <string name="error_division_by_zero">Division by zero</string>
+
+
 </resources>
