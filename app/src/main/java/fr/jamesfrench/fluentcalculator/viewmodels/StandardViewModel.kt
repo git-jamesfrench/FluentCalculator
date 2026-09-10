@@ -6,8 +6,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import com.ezylang.evalex.EvaluationException
 import com.ezylang.evalex.Expression
 import com.ezylang.evalex.config.ExpressionConfiguration
+import com.ezylang.evalex.parser.ParseException
+import fr.jamesfrench.fluentcalculator.R
 import fr.jamesfrench.fluentcalculator.classes.Action
 import fr.jamesfrench.fluentcalculator.classes.ButtonResponse
 import fr.jamesfrench.fluentcalculator.classes.EvaluateResult
@@ -16,7 +19,6 @@ import fr.jamesfrench.fluentcalculator.utils.isValidOperator
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.util.concurrent.Callable
-import java.util.concurrent.ExecutionException
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeoutException
@@ -139,7 +141,7 @@ class StandardViewModel : ViewModel() {
         val expression = Expression(cleanedExpression, configuration)
 
         if (cleanedExpression.isEmpty()) {
-            return@withContext EvaluateResult("", null)
+            return@withContext EvaluateResult.Success("")
         }
 
         val executor = Executors.newSingleThreadExecutor()
@@ -151,12 +153,51 @@ class StandardViewModel : ViewModel() {
             try {
                 val result = future.get(200, TimeUnit.MILLISECONDS)
 
-                return@withContext EvaluateResult(result, null)
+                return@withContext EvaluateResult.Success(result)
             } catch (_: TimeoutException) {
                 future.cancel(true)
-                return@withContext EvaluateResult("", TimeoutException("Equation timeout"))
-            } catch (e: ExecutionException) {
-                return@withContext EvaluateResult("", e.cause as Exception?)
+                return@withContext EvaluateResult.Error(
+                    showImmediately = false,
+                    messageID = R.string.error_value_too_high
+                )
+            } catch (e: Exception) {
+                if (
+                    e.cause != null &&
+                    (e.cause is EvaluationException || e.cause is ParseException) &&
+                    e.message != null
+                ) {
+                    val errorMessage =
+                        e.cause!!.message?.lowercase() // Yes, it's hardcoded, go cry about it, I cry about it too.
+                    var messageID: Int = R.string.error_unknown
+                    var showImmediately = true
+
+                    when (errorMessage) {
+                        "division by zero" -> {
+                            messageID = R.string.error_division_by_zero
+                            showImmediately = false
+                        }
+
+                        "missing operand for operator" -> {
+                            messageID = R.string.error_operand_missing
+                            showImmediately = false
+                        }
+
+                        "missing second operand for operator" -> {
+                            messageID = R.string.error_second_operand_missing
+                            showImmediately = false
+                        }
+                    }
+
+                    return@withContext EvaluateResult.Error(
+                        showImmediately = showImmediately,
+                        messageID = messageID
+                    )
+                } else {
+                    return@withContext EvaluateResult.Error(
+                        showImmediately = true,
+                        message = e.message
+                    )
+                }
             }
         } finally {
             executor.shutdownNow()

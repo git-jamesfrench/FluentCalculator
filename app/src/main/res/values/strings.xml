@@ -3,6 +3,10 @@
     <string name="settings">Settings</string>
     <string name="history">History</string>
     <string name="error_division_by_zero">Division by zero</string>
+    <string name="error_value_too_high">Value too high</string>
+    <string name="error_unknown">Unknown error</string>
+    <string name="error_second_operand_missing">Missing second operand for operator</string>
+    <string name="error_operand_missing">Missing operand for operator</string>
 
 
 </resources>

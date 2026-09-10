@@ -35,6 +35,7 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -223,8 +224,7 @@ fun CalculatorStandard(
 class EquationTransformation(
     private val disabledColor: Color = Color.Black,
     private val errorColor: Color = Color.Black,
-    private val autoAddedColor: Color = Color.Black,
-    private val error: Exception? = null
+    private val autoAddedColor: Color = Color.Black
 ) : OutputTransformation {
     override fun TextFieldBuffer.transformOutput() {
         // Validation
@@ -292,7 +292,7 @@ private fun Result(
     val equationScroll = rememberScrollState()
     val resultScroll = rememberScrollState()
 
-    var result by remember { mutableStateOf(EvaluateResult("", null)) }
+    var result: EvaluateResult by remember { mutableStateOf(EvaluateResult.Success("")) }
     println("[$] COMPOSITION")
 
     LaunchedEffect(vm.equation) {
@@ -342,8 +342,7 @@ private fun Result(
                         outputTransformation = EquationTransformation(
                             C.colors.onBackgroundFaint3,
                             C.colors.error,
-                            C.colors.onBackgroundFaint2,
-                            result.error
+                            C.colors.onBackgroundFaint2
                         ),
                         scrollState = equationScroll,
                         decorator = { inner -> // Screen padding is calculated here, only to optimize clickable space.
@@ -372,30 +371,24 @@ private fun Result(
 //                    .padding(spacing)
 //            )
             Text(
-                text = result.error?.message.toString(),
+                text =
+                    if (result is EvaluateResult.Error)
+                        if ((result as EvaluateResult.Error).messageID != 0)
+                            "⚠ " + stringResource((result as EvaluateResult.Error).messageID)
+                        else
+                            "⚠ " + (result as EvaluateResult.Error).message
+                    else
+                        (result as EvaluateResult.Success).resultString,
                 style = veryLargeNDot.copy(
                     color = C.colors.onBackground,
                     textAlign = TextAlign.Right,
-                    fontSize = (if (result.error == null) 55.sp else 30.sp)
+                    fontSize = if (result is EvaluateResult.Success) 55.sp else 30.sp
                 ),
                 modifier = Modifier
                     .verticalScroll(resultScroll)
                     .fillMaxWidth()
                     .weight(1f)
-                    .padding(spacing + PaddingValues(top = (if (result.error != null) 15.dp else 0.dp)))
-            )
-            Text(
-                text = if (result.error != null) "⚠ ${result.error?.message}" else result.resultString,
-                style = veryLargeNDot.copy(
-                    color = C.colors.onBackground,
-                    textAlign = TextAlign.Right,
-                    fontSize = (if (result.error == null) 55.sp else 30.sp)
-                ),
-                modifier = Modifier
-                    .verticalScroll(resultScroll)
-                    .fillMaxWidth()
-                    .weight(1f)
-                    .padding(spacing + PaddingValues(top = (if (result.error != null) 15.dp else 0.dp)))
+                    .padding(spacing + PaddingValues(top = (if (result is EvaluateResult.Error) 15.dp else 0.dp)))
             )
         }
     }
