@@ -30,6 +30,7 @@ class StandardViewModel : ViewModel() {
     var equation = TextFieldState("")
     var showErrorEquation by mutableStateOf(false)
     var closedParentheses by mutableStateOf(false)
+    var result: EvaluateResult by mutableStateOf(EvaluateResult.Success("", false))
 
     fun executeKeyboardAction(action: Action, value: String = ""): ButtonResponse {
         var success = ButtonResponse(false, 0)
@@ -68,20 +69,12 @@ class StandardViewModel : ViewModel() {
                 }
 
                 Action.Equal -> {
+                    if (result is EvaluateResult.Success && (result as EvaluateResult.Success).display) {
+                        replace(0, length, (result as EvaluateResult.Success).resultString)
+                    }
+
                     success = ButtonResponse(true, 1)
                     showErrorEquation = true
-                    println("[$] ${"-".repeat(20)} SELECTION REPORT ${"-".repeat(20)}")
-                    println(
-                        "[$] ${
-                            StringBuilder(this.toString())
-                                .insert(selection.min, "[")
-                                .insert(selection.max + 1, "]")
-                        }"
-                    )
-                    println("[$] SELECT INDEX: ${selection.min} -> ${selection.max}")
-                    println("[$] MAX INDEX: 0 -> ${maxOf(length - 1, 0)}")
-                    println("[$] AT INDEX MIN: ${this.toString().getOrElse(selection.min) { '⚠' }}")
-                    println("[$] AT INDEX MAX: ${this.toString().getOrElse(selection.max) { '⚠' }}")
                 }
             }
         }
@@ -125,7 +118,6 @@ class StandardViewModel : ViewModel() {
         for (indexes in toRemove) {
             text = text.removeRange(indexes.start, indexes.end)
         }
-        text = text.removeSuffix(".")
 
         repeat(
             maxOf(
@@ -152,21 +144,20 @@ class StandardViewModel : ViewModel() {
         val executor = Executors.newSingleThreadExecutor()
         try {
             val future = executor.submit(Callable {
-                expression.evaluate().numberValue.toString()
+                expression.evaluate()
             })
 
             try {
                 val result = future.get(200, TimeUnit.MILLISECONDS)
 
-                return@withContext EvaluateResult.Success(result, cleanedExpression != result)
+                return@withContext EvaluateResult.Success(
+                    result.numberValue.toString(),
+                    true
+                )
             } catch (exception: Exception) {
                 val exceptionCauseMessage =
                     exception.cause?.message?.lowercase() // Yes, it's hardcoded, go cry about it, I cry about it too.
                 val exceptionCause = exception.cause
-                val exceptionMessage =
-                    exception.message?.lowercase()
-                println(exception)
-                println(exceptionMessage)
 
                 var messageID = 0
                 var showImmediately = true
@@ -211,6 +202,11 @@ class StandardViewModel : ViewModel() {
 
                     exceptionCause is ParseException && exceptionCauseMessage == "structure separator not allowed here" -> {
                         messageID = R.string.error_unexpected_decimal
+                        showImmediately = true
+                    }
+
+                    exceptionCause is ParseException && exceptionCauseMessage == "too many operands" -> {
+                        messageID = R.string.error_too_many_operands
                         showImmediately = true
                     }
 

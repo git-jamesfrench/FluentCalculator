@@ -23,10 +23,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -291,14 +288,11 @@ private fun Result(
     val equationScroll = rememberScrollState()
     val resultScroll = rememberScrollState()
 
-    var result: EvaluateResult by remember { mutableStateOf(EvaluateResult.Success("", false)) }
-    println("[$] COMPOSITION")
-
     LaunchedEffect(vm.equation) {
         snapshotFlow { vm.equation.text.toString() }
             .distinctUntilChanged()
             .collect {
-                result = vm.evaluate()
+                vm.result = vm.evaluate()
                 equationScroll.scrollTo(equationScroll.maxValue)
             }
     }
@@ -378,18 +372,18 @@ private fun Result(
 //            )
             Text(
                 text =
-                    if (result is EvaluateResult.Error)
-                        if ((result as EvaluateResult.Error).showImmediately || vm.showErrorEquation)
-                            if ((result as EvaluateResult.Error).messageID != 0)
-                                "⚠ " + stringResource((result as EvaluateResult.Error).messageID).format(
-                                    *(result as EvaluateResult.Error).values.toTypedArray()
+                    if (vm.result is EvaluateResult.Error)
+                        if ((vm.result as EvaluateResult.Error).showImmediately || vm.showErrorEquation)
+                            if ((vm.result as EvaluateResult.Error).messageID != 0)
+                                "⚠ " + stringResource((vm.result as EvaluateResult.Error).messageID).format(
+                                    *(vm.result as EvaluateResult.Error).values.toTypedArray()
                                 )
                             else
-                                "⚠ " + (result as EvaluateResult.Error).message
+                                "⚠ " + (vm.result as EvaluateResult.Error).message
                         else ""
                     else
-                        if ((result as EvaluateResult.Success).display)
-                            (result as EvaluateResult.Success).resultString.replace(
+                        if ((vm.result as EvaluateResult.Success).display)
+                            (vm.result as EvaluateResult.Success).resultString.replace(
                                 ".",
                                 stringResource(R.string.decimal)
                             )
@@ -397,13 +391,13 @@ private fun Result(
                 style = veryLargeNDot.copy(
                     color = C.colors.onBackground,
                     textAlign = TextAlign.Right,
-                    fontSize = if (result is EvaluateResult.Success) 55.sp else 30.sp
+                    fontSize = if (vm.result is EvaluateResult.Success) 55.sp else 30.sp
                 ),
                 modifier = Modifier
                     .verticalScroll(resultScroll)
                     .fillMaxWidth()
                     .weight(1f)
-                    .padding(spacing + PaddingValues(top = (if (result is EvaluateResult.Error) 15.dp else 0.dp)))
+                    .padding(spacing + PaddingValues(top = (if (vm.result is EvaluateResult.Error) 15.dp else 0.dp)))
             )
         }
     }

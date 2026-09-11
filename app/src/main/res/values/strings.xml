@@ -13,6 +13,7 @@
     <string name="decimal">.</string>
     <string name="error_too_many_decimal">Too many decimal points</string>
     <string name="error_unexpected_decimal">Unexpected decimal point</string>
+    <string name="error_too_many_operands">Too many operands</string>
 
 
 </resources>

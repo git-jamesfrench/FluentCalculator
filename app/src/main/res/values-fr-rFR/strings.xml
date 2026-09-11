@@ -14,4 +14,5 @@
     <string name="decimal">,</string>
     <string name="error_too_many_decimal">Virgule de décimal en trop</string>
     <string name="error_unexpected_decimal">Virgule de décimal inattendu</string>
+    <string name="error_too_many_operands">Opérande inattendu</string>
 </resources>
