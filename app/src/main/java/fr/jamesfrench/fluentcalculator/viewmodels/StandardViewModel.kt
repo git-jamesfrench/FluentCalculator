@@ -18,6 +18,8 @@ import fr.jamesfrench.fluentcalculator.classes.T
 import fr.jamesfrench.fluentcalculator.utils.isValidOperator
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import java.math.BigDecimal
+import java.math.RoundingMode
 import java.util.concurrent.Callable
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
@@ -148,10 +150,20 @@ class StandardViewModel : ViewModel() {
             })
 
             try {
-                val result = future.get(200, TimeUnit.MILLISECONDS)
+                val result = future.get(200, TimeUnit.MILLISECONDS).numberValue
+                val resultExpression = result
+                    .setScale(result.scale().coerceAtMost(15), RoundingMode.HALF_UP)
+                    .let {
+                        if (it.abs() > BigDecimal(10_000_000_000)) {
+                            it.toEngineeringString()
+                        } else {
+                            it.toPlainString()
+                        }
+                    }
+
 
                 return@withContext EvaluateResult.Success(
-                    result.numberValue.toString(),
+                    resultExpression,
                     true
                 )
             } catch (exception: Exception) {
