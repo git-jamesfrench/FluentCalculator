@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Fluent Calculator</string>
-    <string name="settings">Icône paramètres</string>
-    <string name="history">Icône historique</string>
+    <string name="settings">Paramètres</string>
+    <string name="history">Historique</string>
     <string name="error_division_by_zero">Division par zéro</string>
     <string name="error_value_too_high_timeout">Valeur trop élevée (t)</string>
     <string name="error_unknown">Erreur inconnue</string>
@@ -11,4 +11,5 @@
     <string name="error_value_too_high_arithmetic">Valeur trop élevée (a)</string>
     <string name="error_unexpected_token_after_infix_operator">Expression inattendue</string>
     <string name="error_unexpected_closing_brace">Fermeture de parenthèse inattendue</string>
+    <string name="decimal">,</string>
 </resources>

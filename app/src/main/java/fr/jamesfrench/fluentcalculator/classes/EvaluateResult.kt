@@ -3,6 +3,7 @@ package fr.jamesfrench.fluentcalculator.classes
 sealed interface EvaluateResult {
     data class Success(
         val resultString: String,
+        val display: Boolean,
     ) : EvaluateResult
 
     data class Error(

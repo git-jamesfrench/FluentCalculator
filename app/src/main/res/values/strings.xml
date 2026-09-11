@@ -10,6 +10,7 @@
     <string name="error_value_too_high_arithmetic">Value too high (a)</string>
     <string name="error_unexpected_token_after_infix_operator">Unexpected expression</string>
     <string name="error_unexpected_closing_brace">Unexpected closing brace</string>
+    <string name="decimal">.</string>
 
 
 </resources>

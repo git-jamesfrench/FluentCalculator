@@ -144,7 +144,7 @@ class StandardViewModel : ViewModel() {
         val expression = Expression(cleanedExpression, configuration)
 
         if (cleanedExpression.isEmpty()) {
-            return@withContext EvaluateResult.Success("")
+            return@withContext EvaluateResult.Success("", false)
         }
 
         val executor = Executors.newSingleThreadExecutor()
@@ -156,7 +156,7 @@ class StandardViewModel : ViewModel() {
             try {
                 val result = future.get(200, TimeUnit.MILLISECONDS)
 
-                return@withContext EvaluateResult.Success(result)
+                return@withContext EvaluateResult.Success(result, cleanedExpression != result)
             } catch (exception: Exception) {
                 val exceptionCauseMessage =
                     exception.cause?.message?.lowercase() // Yes, it's hardcoded, go cry about it, I cry about it too.

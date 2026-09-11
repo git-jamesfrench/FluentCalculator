@@ -40,6 +40,7 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import fr.jamesfrench.fluentcalculator.R
 import fr.jamesfrench.fluentcalculator.classes.Action
 import fr.jamesfrench.fluentcalculator.classes.ButtonData
 import fr.jamesfrench.fluentcalculator.classes.EvaluateResult
@@ -222,7 +223,8 @@ fun CalculatorStandard(
 class EquationTransformation(
     private val disabledColor: Color = Color.Black,
     private val errorColor: Color = Color.Black,
-    private val autoAddedColor: Color = Color.Black
+    private val autoAddedColor: Color = Color.Black,
+    private val decimal: String = "."
 ) : OutputTransformation {
     override fun TextFieldBuffer.transformOutput() {
         // Validation
@@ -230,12 +232,11 @@ class EquationTransformation(
         var i = 0
 
         for (i in text.indices) {
-            if (text[i] in T.Operator.values) {
-                when (text[i]) {
-                    '-' -> replace(i, i + 1, "−")
-                    '*' -> replace(i, i + 1, "×")
-                    '/' -> replace(i, i + 1, "÷")
-                }
+            when (text[i]) {
+                '-' -> replace(i, i + 1, "−")
+                '*' -> replace(i, i + 1, "×")
+                '/' -> replace(i, i + 1, "÷")
+                '.' -> replace(i, i + 1, decimal)
             }
         }
 
@@ -290,7 +291,7 @@ private fun Result(
     val equationScroll = rememberScrollState()
     val resultScroll = rememberScrollState()
 
-    var result: EvaluateResult by remember { mutableStateOf(EvaluateResult.Success("")) }
+    var result: EvaluateResult by remember { mutableStateOf(EvaluateResult.Success("", false)) }
     println("[$] COMPOSITION")
 
     LaunchedEffect(vm.equation) {
@@ -304,7 +305,6 @@ private fun Result(
     LaunchedEffect(vm.equation) {
         snapshotFlow { vm.equation.selection }
             .collect {
-                println("CHECK SELECTION")
                 vm.setClosedParentheses()
             }
     }
@@ -347,7 +347,8 @@ private fun Result(
                         outputTransformation = EquationTransformation(
                             C.colors.onBackgroundFaint3,
                             C.colors.error,
-                            C.colors.onBackgroundFaint2
+                            C.colors.onBackgroundFaint2,
+                            stringResource(R.string.decimal)
                         ),
                         scrollState = equationScroll,
                         decorator = { inner -> // Screen padding is calculated here, only to optimize clickable space.
@@ -386,7 +387,13 @@ private fun Result(
                             else
                                 "⚠ " + (result as EvaluateResult.Error).message
                         else ""
-                    else (result as EvaluateResult.Success).resultString,
+                    else
+                        if ((result as EvaluateResult.Success).display)
+                            (result as EvaluateResult.Success).resultString.replace(
+                                ".",
+                                stringResource(R.string.decimal)
+                            )
+                        else "",
                 style = veryLargeNDot.copy(
                     color = C.colors.onBackground,
                     textAlign = TextAlign.Right,
