@@ -121,6 +121,22 @@ class StandardViewModel : ViewModel() {
             text = text.removeRange(indexes.start, indexes.end)
         }
 
+        for (char in text.reversed()) {
+            when (char) {
+                '0' -> {
+                    text = text.dropLast(1)
+                }
+
+                '.' -> {
+                    text = text.dropLast(1); break
+                }
+
+                else -> {
+                    break
+                }
+            }
+        }
+
         repeat(
             maxOf(
                 0,
@@ -151,6 +167,7 @@ class StandardViewModel : ViewModel() {
 
             try {
                 val result = future.get(200, TimeUnit.MILLISECONDS).numberValue
+                val rawResult = result.toPlainString()
                 val resultExpression = result
                     .setScale(result.scale().coerceAtMost(15), RoundingMode.HALF_UP)
                     .let {
@@ -161,10 +178,9 @@ class StandardViewModel : ViewModel() {
                         }
                     }
 
-
                 return@withContext EvaluateResult.Success(
                     resultExpression,
-                    true
+                    cleanedExpression != rawResult
                 )
             } catch (exception: Exception) {
                 val exceptionCauseMessage =
