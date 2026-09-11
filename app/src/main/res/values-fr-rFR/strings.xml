@@ -12,5 +12,6 @@
     <string name="error_unexpected_token_after_infix_operator">Expression inattendue</string>
     <string name="error_unexpected_closing_brace">Fermeture de parenthèse inattendue</string>
     <string name="decimal">,</string>
-    <string name="error_unexpected_decimal_point">Virgule de décimal inattendu</string>
+    <string name="error_too_many_decimal">Virgule de décimal en trop</string>
+    <string name="error_unexpected_decimal">Virgule de décimal inattendu</string>
 </resources>

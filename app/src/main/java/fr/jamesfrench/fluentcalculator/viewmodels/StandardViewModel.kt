@@ -205,7 +205,12 @@ class StandardViewModel : ViewModel() {
                     }
 
                     exceptionCause is ParseException && exceptionCauseMessage == "number contains more than one decimal point" -> {
-                        messageID = R.string.error_unexpected_decimal_point
+                        messageID = R.string.error_too_many_decimal
+                        showImmediately = true
+                    }
+
+                    exceptionCause is ParseException && exceptionCauseMessage == "structure separator not allowed here" -> {
+                        messageID = R.string.error_unexpected_decimal
                         showImmediately = true
                     }
 
