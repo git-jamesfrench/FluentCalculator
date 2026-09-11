@@ -4,8 +4,9 @@
     <string name="settings">Icône paramètres</string>
     <string name="history">Icône historique</string>
     <string name="error_division_by_zero">Division par zéro</string>
-    <string name="error_value_too_high">Valeur trop élevée</string>
+    <string name="error_value_too_high_timeout">Valeur trop élevée (t)</string>
     <string name="error_unknown">Erreur inconnue</string>
     <string name="error_second_operand_missing">Deuxième opérande pour l\'opérateur manquante</string>
     <string name="error_operand_missing">Opérande pour l\'opérateur manquante</string>
+    <string name="error_value_too_high_arithmetic">Valeur trop élevée (a)</string>
 </resources>

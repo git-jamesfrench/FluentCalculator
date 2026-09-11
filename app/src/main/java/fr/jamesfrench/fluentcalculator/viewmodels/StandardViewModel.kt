@@ -55,6 +55,7 @@ class StandardViewModel : ViewModel() {
 
                         delete(selection.min - offset, selection.max)
                         success = ButtonResponse(true, 0)
+                        showErrorEquation = false
                     }
                 }
 
@@ -62,6 +63,7 @@ class StandardViewModel : ViewModel() {
                     if (length > 0) {
                         delete(0, length)
                         success = ButtonResponse(true, 0)
+                        showErrorEquation = false
                     }
                 }
 
@@ -154,50 +156,52 @@ class StandardViewModel : ViewModel() {
                 val result = future.get(200, TimeUnit.MILLISECONDS)
 
                 return@withContext EvaluateResult.Success(result)
-            } catch (_: TimeoutException) {
-                future.cancel(true)
-                return@withContext EvaluateResult.Error(
-                    showImmediately = false,
-                    messageID = R.string.error_value_too_high
-                )
-            } catch (e: Exception) {
-                if (
-                    e.cause != null &&
-                    (e.cause is EvaluationException || e.cause is ParseException) &&
-                    e.message != null
-                ) {
-                    val errorMessage =
-                        e.cause!!.message?.lowercase() // Yes, it's hardcoded, go cry about it, I cry about it too.
-                    var messageID: Int = R.string.error_unknown
-                    var showImmediately = true
+            } catch (exception: Exception) {
+                val exceptionCauseMessage =
+                    exception.cause?.message?.lowercase() // Yes, it's hardcoded, go cry about it, I cry about it too.
+                val exceptionCause = exception.cause
+                val exceptionMessage =
+                    exception.message?.lowercase()
+                println(exception)
+                println(exceptionMessage)
 
-                    when (errorMessage) {
-                        "division by zero" -> {
-                            messageID = R.string.error_division_by_zero
-                            showImmediately = false
-                        }
+                var messageID = 0
+                var showImmediately = true
 
-                        "missing operand for operator" -> {
-                            messageID = R.string.error_operand_missing
-                            showImmediately = false
-                        }
-
-                        "missing second operand for operator" -> {
-                            messageID = R.string.error_second_operand_missing
-                            showImmediately = false
-                        }
+                when {
+                    exception is TimeoutException -> {
+                        future.cancel(true)
+                        messageID = R.string.error_value_too_high_timeout
+                        showImmediately = true
                     }
 
-                    return@withContext EvaluateResult.Error(
-                        showImmediately = showImmediately,
-                        messageID = messageID
-                    )
-                } else {
-                    return@withContext EvaluateResult.Error(
-                        showImmediately = true,
-                        message = e.message
-                    )
+                    exceptionCause is EvaluationException && exceptionCauseMessage == "division by zero" -> {
+                        messageID = R.string.error_division_by_zero
+                        showImmediately = false
+                    }
+
+                    exceptionCause is ParseException && exceptionCauseMessage == "missing operand for operator" -> {
+                        messageID = R.string.error_operand_missing
+                        showImmediately = false
+                    }
+
+                    exceptionCause is ParseException && exceptionCauseMessage == "missing second operand for operator" -> {
+                        messageID = R.string.error_second_operand_missing
+                        showImmediately = false
+                    }
+
+                    exceptionCause is ArithmeticException && exceptionCauseMessage == "overflow" -> {
+                        messageID = R.string.error_value_too_high_arithmetic
+                        showImmediately = true
+                    }
                 }
+
+                return@withContext EvaluateResult.Error(
+                    showImmediately = showImmediately,
+                    messageID = messageID,
+                    message = exception.message
+                )
+
             }
         } finally {
             executor.shutdownNow()

@@ -165,14 +165,13 @@ fun CalculatorStandard(
                                     item.variant,
                                     modifier = Modifier
                                         .weight(1f)
-                                        .aspectRatio(1f),
-                                    {
-                                        return@BigButton vm.executeKeyboardAction(
-                                            item.action,
-                                            item.value
-                                        )
-                                    }
-                                )
+                                        .aspectRatio(1f)
+                                ) {
+                                    return@BigButton vm.executeKeyboardAction(
+                                        item.action,
+                                        item.value
+                                    )
+                                }
                             }
                         }
                     }
@@ -206,11 +205,10 @@ fun CalculatorStandard(
                                     item.variant,
                                     modifier = Modifier
                                         .weight(1f)
-                                        .aspectRatio(1f),
-                                    {
-                                        vm.executeKeyboardAction(item.action, item.value)
-                                    }
-                                )
+                                        .aspectRatio(1f)
+                                ) {
+                                    vm.executeKeyboardAction(item.action, item.value)
+                                }
                             }
                         }
                     }
@@ -373,12 +371,13 @@ private fun Result(
             Text(
                 text =
                     if (result is EvaluateResult.Error)
-                        if ((result as EvaluateResult.Error).messageID != 0)
-                            "⚠ " + stringResource((result as EvaluateResult.Error).messageID)
-                        else
-                            "⚠ " + (result as EvaluateResult.Error).message
-                    else
-                        (result as EvaluateResult.Success).resultString,
+                        if ((result as EvaluateResult.Error).showImmediately || vm.showErrorEquation)
+                            if ((result as EvaluateResult.Error).messageID != 0)
+                                "⚠ " + stringResource((result as EvaluateResult.Error).messageID)
+                            else
+                                "⚠ " + (result as EvaluateResult.Error).message
+                        else ""
+                    else (result as EvaluateResult.Success).resultString,
                 style = veryLargeNDot.copy(
                     color = C.colors.onBackground,
                     textAlign = TextAlign.Right,
