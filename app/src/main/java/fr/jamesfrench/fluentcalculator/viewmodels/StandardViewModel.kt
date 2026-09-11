@@ -73,10 +73,9 @@ class StandardViewModel : ViewModel() {
                 Action.Equal -> {
                     if (result is EvaluateResult.Success && (result as EvaluateResult.Success).display) {
                         replace(0, length, (result as EvaluateResult.Success).resultString)
+                        success = ButtonResponse(true, 1)
+                        showErrorEquation = true
                     }
-
-                    success = ButtonResponse(true, 1)
-                    showErrorEquation = true
                 }
             }
         }
