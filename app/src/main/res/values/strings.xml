@@ -11,6 +11,7 @@
     <string name="error_unexpected_token_after_infix_operator">Unexpected expression</string>
     <string name="error_unexpected_closing_brace">Unexpected closing brace</string>
     <string name="decimal">.</string>
+    <string name="error_unexpected_decimal_point">Unexpected decimal point</string>
 
 
 </resources>

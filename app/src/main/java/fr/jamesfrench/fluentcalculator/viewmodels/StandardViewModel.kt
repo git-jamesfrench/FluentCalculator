@@ -204,6 +204,11 @@ class StandardViewModel : ViewModel() {
                         showImmediately = true
                     }
 
+                    exceptionCause is ParseException && exceptionCauseMessage == "number contains more than one decimal point" -> {
+                        messageID = R.string.error_unexpected_decimal_point
+                        showImmediately = true
+                    }
+
                     exceptionCause is ArithmeticException && exceptionCauseMessage == "overflow" -> {
                         messageID = R.string.error_value_too_high_arithmetic
                         showImmediately = true
