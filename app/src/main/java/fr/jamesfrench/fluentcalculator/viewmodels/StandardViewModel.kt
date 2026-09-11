@@ -125,6 +125,8 @@ class StandardViewModel : ViewModel() {
         for (indexes in toRemove) {
             text = text.removeRange(indexes.start, indexes.end)
         }
+        text = text.removeSuffix(".")
+
         repeat(
             maxOf(
                 0,
