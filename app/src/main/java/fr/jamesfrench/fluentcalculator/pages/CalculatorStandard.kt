@@ -301,6 +301,13 @@ private fun Result(
                 equationScroll.scrollTo(equationScroll.maxValue)
             }
     }
+    LaunchedEffect(vm.equation) {
+        snapshotFlow { vm.equation.selection }
+            .collect {
+                println("CHECK SELECTION")
+                vm.setClosedParentheses()
+            }
+    }
 
     Column(
         modifier = modifier,
@@ -373,7 +380,9 @@ private fun Result(
                     if (result is EvaluateResult.Error)
                         if ((result as EvaluateResult.Error).showImmediately || vm.showErrorEquation)
                             if ((result as EvaluateResult.Error).messageID != 0)
-                                "⚠ " + stringResource((result as EvaluateResult.Error).messageID)
+                                "⚠ " + stringResource((result as EvaluateResult.Error).messageID).format(
+                                    *(result as EvaluateResult.Error).values.toTypedArray()
+                                )
                             else
                                 "⚠ " + (result as EvaluateResult.Error).message
                         else ""

@@ -90,8 +90,9 @@ class StandardViewModel : ViewModel() {
     }
 
     fun setClosedParentheses() {
+        val before = equation.text.substring(0, equation.selection.max)
         val ratioParentheses =
-            equation.text.count { it == T.OpenParentheses.value } - equation.text.count { it == T.CloseParentheses.value }
+            before.count { it == T.OpenParentheses.value } - before.count { it == T.CloseParentheses.value }
         closedParentheses =
             ratioParentheses > 0 && equation.text.getOrNull(equation.selection.min - 1) in T.Number.values + T.CloseParentheses.value
     }
@@ -167,6 +168,7 @@ class StandardViewModel : ViewModel() {
 
                 var messageID = 0
                 var showImmediately = true
+                val values: List<String> = listOf()
 
                 when {
                     exception is TimeoutException -> {
@@ -190,6 +192,16 @@ class StandardViewModel : ViewModel() {
                         showImmediately = false
                     }
 
+                    exceptionCause is ParseException && exceptionCauseMessage == "unexpected token after infix operator" -> {
+                        messageID = R.string.error_unexpected_token_after_infix_operator
+                        showImmediately = true
+                    }
+
+                    exceptionCause is ParseException && exceptionCauseMessage == "unexpected closing brace" -> {
+                        messageID = R.string.error_unexpected_closing_brace
+                        showImmediately = true
+                    }
+
                     exceptionCause is ArithmeticException && exceptionCauseMessage == "overflow" -> {
                         messageID = R.string.error_value_too_high_arithmetic
                         showImmediately = true
@@ -199,7 +211,8 @@ class StandardViewModel : ViewModel() {
                 return@withContext EvaluateResult.Error(
                     showImmediately = showImmediately,
                     messageID = messageID,
-                    message = exception.message
+                    message = exception.message,
+                    values = values
                 )
 
             }

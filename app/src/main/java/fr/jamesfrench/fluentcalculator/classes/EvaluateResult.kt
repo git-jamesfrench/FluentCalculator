@@ -8,6 +8,7 @@ sealed interface EvaluateResult {
     data class Error(
         val showImmediately: Boolean,
         val messageID: Int = 0,
-        val message: String? = null
+        val message: String? = null,
+        val values: List<String> = listOf()
     ) : EvaluateResult
 }
