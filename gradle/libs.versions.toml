@@ -7,6 +7,7 @@ activityCompose = "1.13.0"
 kotlin = "2.4.10"
 composeBom = "2026.08.00"
 navigationCompose = "2.10.0"
+objectbox = "5.4.2"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -24,3 +25,5 @@ evalex = { module = "com.ezylang:EvalEx", version.ref = "evalex" }
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+kotlin-kapt = { id = "com.android.legacy-kapt", version.ref = "agp" } # For objectbox
+objectbox = { id = "io.objectbox", version.ref = "objectbox" }
