@@ -1,11 +1,14 @@
 package fr.jamesfrench.fluentcalculator.viewmodels
 
+import android.app.Application
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.delete
+import androidx.compose.foundation.text.input.placeCursorAtEnd
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.AndroidViewModel
 import com.ezylang.evalex.EvaluationException
 import com.ezylang.evalex.Expression
 import com.ezylang.evalex.config.ExpressionConfiguration
@@ -14,7 +17,9 @@ import fr.jamesfrench.fluentcalculator.R
 import fr.jamesfrench.fluentcalculator.classes.Action
 import fr.jamesfrench.fluentcalculator.classes.ButtonResponse
 import fr.jamesfrench.fluentcalculator.classes.EvaluateResult
+import fr.jamesfrench.fluentcalculator.classes.HistoryEntry
 import fr.jamesfrench.fluentcalculator.classes.T
+import fr.jamesfrench.fluentcalculator.utils.HistoryStore
 import fr.jamesfrench.fluentcalculator.utils.isValidOperator
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -25,7 +30,7 @@ import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeoutException
 
-class StandardViewModel : ViewModel() {
+class StandardViewModel(application: Application) : AndroidViewModel(application) {
     private val configuration = ExpressionConfiguration.builder()
         .maxRecursionDepth(2000)
         .build()
@@ -33,6 +38,42 @@ class StandardViewModel : ViewModel() {
     var showErrorEquation by mutableStateOf(false)
     var closedParentheses by mutableStateOf(false)
     var result: EvaluateResult by mutableStateOf(EvaluateResult.Success("", false))
+
+    val history = mutableStateListOf<HistoryEntry>().apply {
+        addAll(HistoryStore.load(application))
+    }
+
+    private fun persistHistory() {
+        HistoryStore.save(getApplication(), history)
+    }
+
+    private fun addHistoryEntry(equationText: String, resultText: String) {
+        if (equationText.isBlank() || resultText.isBlank()) return
+
+        history.add(0, HistoryEntry(System.nanoTime(), equationText, resultText))
+        if (history.size > 100) {
+            history.removeAt(history.lastIndex)
+        }
+        persistHistory()
+    }
+
+    fun deleteHistoryEntry(id: Long) {
+        history.removeAll { it.id == id }
+        persistHistory()
+    }
+
+    fun clearHistory() {
+        history.clear()
+        persistHistory()
+    }
+
+    fun loadHistoryEntry(entry: HistoryEntry) {
+        equation.edit {
+            replace(0, length, entry.equation)
+            placeCursorAtEnd()
+        }
+        setClosedParentheses()
+    }
 
     fun executeKeyboardAction(action: Action, value: String = ""): ButtonResponse {
         var success = ButtonResponse(false, 0)
@@ -72,9 +113,14 @@ class StandardViewModel : ViewModel() {
 
                 Action.Equal -> {
                     if (result is EvaluateResult.Success && (result as EvaluateResult.Success).display) {
-                        replace(0, length, (result as EvaluateResult.Success).resultString)
+                        val resultString = (result as EvaluateResult.Success).resultString
+                        val previousEquation = cleanExpression(equation.text.toString())
+
+                        replace(0, length, resultString)
                         success = ButtonResponse(true, 1)
                         showErrorEquation = true
+
+                        addHistoryEntry(previousEquation, resultString)
                     }
                 }
             }
