@@ -55,7 +55,9 @@ private fun interpolate(values: List<Int>, index: Float): Float {
 @Composable
 fun Navigation(
     options: List<String>,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onSettingsClick: () -> Unit = {},
+    onHistoryClick: () -> Unit = {}
 ) {
     val textMeasurer: TextMeasurer = rememberTextMeasurer()
     var selectorSize by remember { mutableStateOf(IntSize.Zero) }
@@ -84,7 +86,10 @@ fun Navigation(
             .border(1.dp, C.colors.surface, RoundedCornerShape(100))
     ) {
         // Button 1
-        RoundButton(onClick = { return@RoundButton false }) {
+        RoundButton(onClick = {
+            onSettingsClick()
+            return@RoundButton false
+        }) {
             Icon(
                 LucideCog,
                 stringResource(R.string.settings),
@@ -147,7 +152,10 @@ fun Navigation(
             )
         }
         // Button 2
-        RoundButton(onClick = { return@RoundButton false }) {
+        RoundButton(onClick = {
+            onHistoryClick()
+            return@RoundButton true
+        }) {
             Icon(
                 LucideHistory,
                 stringResource(R.string.history),

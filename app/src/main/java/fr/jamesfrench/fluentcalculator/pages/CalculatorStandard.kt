@@ -23,7 +23,10 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -44,6 +47,7 @@ import fr.jamesfrench.fluentcalculator.classes.EvaluateResult
 import fr.jamesfrench.fluentcalculator.classes.T
 import fr.jamesfrench.fluentcalculator.components.BigButton
 import fr.jamesfrench.fluentcalculator.components.BigButtonVariant
+import fr.jamesfrench.fluentcalculator.components.HistorySheet
 import fr.jamesfrench.fluentcalculator.components.Navigation
 import fr.jamesfrench.fluentcalculator.components.Text
 import fr.jamesfrench.fluentcalculator.ui.theme.C
@@ -278,6 +282,7 @@ private fun Result(
     vm: StandardViewModel
 ) {
     val focusRequester = remember { FocusRequester() }
+    var showHistory by remember { mutableStateOf(false) }
     val selectionColors = TextSelectionColors(
         handleColor = C.colors.accent,
         backgroundColor = C.colors.accent.copy(alpha = 0.4f)
@@ -313,7 +318,8 @@ private fun Result(
                 "Standard",
                 "Scientific",
             ),
-            Modifier.padding(screenPadding)
+            Modifier.padding(screenPadding),
+            onHistoryClick = { showHistory = true }
         )
         Column(
             modifier = Modifier
@@ -404,5 +410,18 @@ private fun Result(
 
     LaunchedEffect(Unit) {
         focusRequester.requestFocus()
+    }
+
+    if (showHistory) {
+        HistorySheet(
+            history = vm.history,
+            onDismiss = { showHistory = false },
+            onSelect = { entry ->
+                vm.loadHistoryEntry(entry)
+                showHistory = false
+            },
+            onDelete = { entry -> vm.deleteHistoryEntry(entry.id) },
+            onClearAll = { vm.clearHistory() }
+        )
     }
 }
