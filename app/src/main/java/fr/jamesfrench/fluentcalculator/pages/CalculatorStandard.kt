@@ -57,6 +57,7 @@ import fr.jamesfrench.fluentcalculator.utils.DisableSoftKeyboard
 import fr.jamesfrench.fluentcalculator.utils.copy
 import fr.jamesfrench.fluentcalculator.utils.isValidOperator
 import fr.jamesfrench.fluentcalculator.viewmodels.StandardViewModel
+import fr.jamesfrench.fluentcalculator.utils.CalculatorInputTransformation
 import kotlinx.coroutines.flow.distinctUntilChanged
 
 private val ButtonsVertical = listOf(
@@ -350,6 +351,7 @@ private fun Result(
                             C.colors.onBackgroundFaint2,
                             stringResource(R.string.decimal)
                         ),
+                        inputTransformation = CalculatorInputTransformation,
                         scrollState = equationScroll,
                         decorator = { inner -> // Screen padding is calculated here, only to optimize clickable space.
                             Box(
