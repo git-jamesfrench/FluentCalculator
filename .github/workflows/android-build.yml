@@ -56,7 +56,7 @@ jobs:
       - name: Publish pre-release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: build-${{ github.run_number }}
+          tag_name: build-latest
           name: Build ${{ github.run_number }}
           target_commitish: ${{ github.sha }}
           prerelease: true

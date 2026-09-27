@@ -23,10 +23,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -47,7 +44,6 @@ import fr.jamesfrench.fluentcalculator.classes.EvaluateResult
 import fr.jamesfrench.fluentcalculator.classes.T
 import fr.jamesfrench.fluentcalculator.components.BigButton
 import fr.jamesfrench.fluentcalculator.components.BigButtonVariant
-import fr.jamesfrench.fluentcalculator.components.HistorySheet
 import fr.jamesfrench.fluentcalculator.components.Navigation
 import fr.jamesfrench.fluentcalculator.components.Text
 import fr.jamesfrench.fluentcalculator.ui.theme.C
@@ -128,7 +124,8 @@ private val ButtonsHorizontal = listOf(
 @Composable
 fun CalculatorStandard(
     screenPadding: PaddingValues,
-    vm: StandardViewModel
+    vm: StandardViewModel,
+    onHistoryClick: () -> Unit = {}
 ) {
     val orientation = LocalConfiguration.current.orientation
     val layout = when (orientation) {
@@ -148,7 +145,8 @@ fun CalculatorStandard(
                 Result(
                     screenPadding.copy(end = 0.dp, bottom = 0.dp),
                     modifier = Modifier.weight(1f),
-                    vm
+                    vm,
+                    onHistoryClick = onHistoryClick
                 )
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -188,7 +186,8 @@ fun CalculatorStandard(
                 Result(
                     screenPadding.copy(bottom = 0.dp),
                     modifier = Modifier.weight(1f),
-                    vm
+                    vm,
+                    onHistoryClick = onHistoryClick
                 )
                 Column(
                     verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -280,10 +279,10 @@ class EquationTransformation(
 private fun Result(
     screenPadding: PaddingValues,
     modifier: Modifier = Modifier,
-    vm: StandardViewModel
+    vm: StandardViewModel,
+    onHistoryClick: () -> Unit = {}
 ) {
     val focusRequester = remember { FocusRequester() }
-    var showHistory by remember { mutableStateOf(false) }
     val selectionColors = TextSelectionColors(
         handleColor = C.colors.accent,
         backgroundColor = C.colors.accent.copy(alpha = 0.4f)
@@ -293,6 +292,7 @@ private fun Result(
 
     val equationScroll = rememberScrollState()
     val resultScroll = rememberScrollState()
+    val decimal = stringResource(R.string.decimal)
 
     LaunchedEffect(vm.equation) {
         snapshotFlow { vm.equation.text.toString() }
@@ -320,7 +320,7 @@ private fun Result(
                 "Scientific",
             ),
             Modifier.padding(screenPadding),
-            onHistoryClick = { showHistory = true }
+            onHistoryClick = onHistoryClick
         )
         Column(
             modifier = Modifier
@@ -349,9 +349,9 @@ private fun Result(
                             C.colors.onBackgroundFaint3,
                             C.colors.error,
                             C.colors.onBackgroundFaint2,
-                            stringResource(R.string.decimal)
+                            decimal
                         ),
-                        inputTransformation = CalculatorInputTransformation,
+                        inputTransformation = CalculatorInputTransformation(decimal),
                         scrollState = equationScroll,
                         decorator = { inner -> // Screen padding is calculated here, only to optimize clickable space.
                             Box(
@@ -412,18 +412,5 @@ private fun Result(
 
     LaunchedEffect(Unit) {
         focusRequester.requestFocus()
-    }
-
-    if (showHistory) {
-        HistorySheet(
-            history = vm.history,
-            onDismiss = { showHistory = false },
-            onSelect = { entry ->
-                vm.loadHistoryEntry(entry)
-                showHistory = false
-            },
-            onDelete = { entry -> vm.deleteHistoryEntry(entry.id) },
-            onClearAll = { vm.clearHistory() }
-        )
     }
 }
