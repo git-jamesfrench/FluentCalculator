@@ -31,33 +31,9 @@
         }
       ],
       "relations": []
-    },
-    {
-      "id": "2:5576646883940522329",
-      "lastPropertyId": "3:8272116481964817095",
-      "name": "ThemePrefsEntity",
-      "properties": [
-        {
-          "id": "1:8920479234798568795",
-          "name": "id",
-          "type": 6,
-          "flags": 1
-        },
-        {
-          "id": "2:3539856972431100423",
-          "name": "mode",
-          "type": 9
-        },
-        {
-          "id": "3:8272116481964817095",
-          "name": "familyId",
-          "type": 9
-        }
-      ],
-      "relations": []
     }
   ],
-  "lastEntityId": "2:5576646883940522329",
+  "lastEntityId": "1:100990699753211433",
   "lastIndexId": "0:0",
   "lastRelationId": "0:0",
   "lastSequenceId": "0:0",

@@ -1,6 +1,7 @@
 package fr.jamesfrench.fluentcalculator.data
 
 import android.content.Context
+import fr.jamesfrench.fluentcalculator.MyObjectBox
 import io.objectbox.BoxStore
 
 object ObjectBox {
