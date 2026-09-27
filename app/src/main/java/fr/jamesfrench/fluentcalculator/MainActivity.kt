@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -34,6 +35,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             FluentCalculatorTheme {
                 val vm: StandardViewModel = viewModel()
+                val history by vm.history.collectAsState()
                 var showHistory by remember { mutableStateOf(false) }
 
                 val layoutDirection = LocalLayoutDirection.current
@@ -60,7 +62,7 @@ class MainActivity : ComponentActivity() {
 
                     if (showHistory) {
                         HistorySheet(
-                            history = vm.history,
+                            history = history,
                             onDismiss = { showHistory = false },
                             onSelect = { entry ->
                                 vm.loadHistoryEntry(entry)

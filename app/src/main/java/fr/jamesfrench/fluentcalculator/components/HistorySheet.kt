@@ -37,7 +37,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import fr.jamesfrench.fluentcalculator.R
-import fr.jamesfrench.fluentcalculator.classes.HistoryEntry
+import fr.jamesfrench.fluentcalculator.data.HistoryEntry
 import fr.jamesfrench.fluentcalculator.ui.theme.C
 import fr.jamesfrench.fluentcalculator.ui.theme.largeInter
 import fr.jamesfrench.fluentcalculator.ui.theme.mediumInter
@@ -93,7 +93,7 @@ fun HistorySheet(
                         C.colors.background,
                         RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp)
                     )
-                    .clickable(
+                    .clickable( // Consume clicks so they don't dismiss the sheet
                         interactionSource = remember { MutableInteractionSource() },
                         indication = null,
                         onClick = {}

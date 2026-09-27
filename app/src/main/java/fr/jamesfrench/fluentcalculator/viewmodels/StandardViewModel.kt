@@ -5,10 +5,10 @@ import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.delete
 import androidx.compose.foundation.text.input.placeCursorAtEnd
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.viewModelScope
 import com.ezylang.evalex.EvaluationException
 import com.ezylang.evalex.Expression
 import com.ezylang.evalex.config.ExpressionConfiguration
@@ -17,11 +17,14 @@ import fr.jamesfrench.fluentcalculator.R
 import fr.jamesfrench.fluentcalculator.classes.Action
 import fr.jamesfrench.fluentcalculator.classes.ButtonResponse
 import fr.jamesfrench.fluentcalculator.classes.EvaluateResult
-import fr.jamesfrench.fluentcalculator.classes.HistoryEntry
 import fr.jamesfrench.fluentcalculator.classes.T
-import fr.jamesfrench.fluentcalculator.utils.HistoryStore
+import fr.jamesfrench.fluentcalculator.data.HistoryEntry
+import fr.jamesfrench.fluentcalculator.data.HistoryRepository
+import fr.jamesfrench.fluentcalculator.data.ObjectBox
 import fr.jamesfrench.fluentcalculator.utils.isValidOperator
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.math.BigDecimal
 import java.math.RoundingMode
@@ -39,32 +42,33 @@ class StandardViewModel(application: Application) : AndroidViewModel(application
     var closedParentheses by mutableStateOf(false)
     var result: EvaluateResult by mutableStateOf(EvaluateResult.Success("", false))
 
-    val history = mutableStateListOf<HistoryEntry>().apply {
-        addAll(HistoryStore.load(application))
-    }
+    private val historyRepository =
+        HistoryRepository(ObjectBox.store.boxFor(HistoryEntry::class.java))
+    val history: StateFlow<List<HistoryEntry>> = historyRepository.history
 
-    private fun persistHistory() {
-        HistoryStore.save(getApplication(), history)
+    override fun onCleared() {
+        historyRepository.close()
+        super.onCleared()
     }
 
     private fun addHistoryEntry(equationText: String, resultText: String) {
         if (equationText.isBlank() || resultText.isBlank()) return
 
-        history.add(0, HistoryEntry(System.nanoTime(), equationText, resultText))
-        if (history.size > 100) {
-            history.removeAt(history.lastIndex)
+        viewModelScope.launch {
+            historyRepository.add(equationText, resultText)
         }
-        persistHistory()
     }
 
     fun deleteHistoryEntry(id: Long) {
-        history.removeAll { it.id == id }
-        persistHistory()
+        viewModelScope.launch {
+            historyRepository.delete(id)
+        }
     }
 
     fun clearHistory() {
-        history.clear()
-        persistHistory()
+        viewModelScope.launch {
+            historyRepository.clear()
+        }
     }
 
     fun loadHistoryEntry(entry: HistoryEntry) {
