@@ -17,7 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.unit.dp
-import fr.jamesfrench.fluentcalculator.ui.theme.C
+import fr.jamesfrench.fluentcalculator.styling.S
 
 @Composable
 fun RoundButton(
@@ -30,7 +30,7 @@ fun RoundButton(
     val haptic = LocalHapticFeedback.current
 
     val color = animateColorAsState(
-        targetValue = if (isPressed) C.colors.activeNeutral else C.colors.background,
+        targetValue = if (isPressed) S.colors.activeNeutral else S.colors.background,
         animationSpec = if (isPressed)
             tween(0, easing = EaseOut)
         else

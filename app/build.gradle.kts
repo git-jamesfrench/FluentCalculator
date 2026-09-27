@@ -3,7 +3,6 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.kapt)
     alias(libs.plugins.objectbox)
-
 }
 
 android {
@@ -70,5 +69,8 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.navigation.compose)
+    releaseImplementation(libs.objectbox.android)
     implementation(libs.evalex)
+
+    debugImplementation(libs.objectbox.android.objectbrowser)
 }

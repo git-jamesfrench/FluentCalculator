@@ -7,7 +7,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import fr.jamesfrench.fluentcalculator.ui.theme.C
+import fr.jamesfrench.fluentcalculator.styling.S
 import androidx.compose.material3.Icon as MIcon
 
 @Composable
@@ -16,7 +16,7 @@ fun Icon(
     iconDescription: String,
     modifier: Modifier = Modifier,
     size: Dp = 24.dp,
-    color: Color = C.colors.onBackground,
+    color: Color = S.colors.onBackground,
 ) {
     MIcon(
         imageVector = icon,

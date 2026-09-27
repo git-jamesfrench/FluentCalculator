@@ -8,6 +8,8 @@ kotlin = "2.4.20"
 composeBom = "2026.09.00"
 navigationCompose = "2.10.2"
 objectbox = "5.4.2"
+objectboxAndroid = "5.4.2"
+objectboxAndroidObjectbrowser = "5.4.2"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -21,6 +23,8 @@ androidx-compose-material3 = { group = "androidx.compose.material3", name = "mat
 androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose" }
 androidx-compose-ui-text = { group = "androidx.compose.ui", name = "ui-text" }
 evalex = { module = "com.ezylang:EvalEx", version.ref = "evalex" }
+objectbox-android = { module = "io.objectbox:objectbox-android", version.ref = "objectboxAndroid" }
+objectbox-android-objectbrowser = { module = "io.objectbox:objectbox-android-objectbrowser", version.ref = "objectboxAndroidObjectbrowser" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

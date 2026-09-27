@@ -46,7 +46,7 @@ import fr.jamesfrench.fluentcalculator.components.BigButton
 import fr.jamesfrench.fluentcalculator.components.BigButtonVariant
 import fr.jamesfrench.fluentcalculator.components.Navigation
 import fr.jamesfrench.fluentcalculator.components.Text
-import fr.jamesfrench.fluentcalculator.ui.theme.C
+import fr.jamesfrench.fluentcalculator.styling.S
 import fr.jamesfrench.fluentcalculator.ui.theme.largeInter
 import fr.jamesfrench.fluentcalculator.ui.theme.veryLargeNDot
 import fr.jamesfrench.fluentcalculator.utils.DisableSoftKeyboard
@@ -279,8 +279,8 @@ private fun Result(
 ) {
     val focusRequester = remember { FocusRequester() }
     val selectionColors = TextSelectionColors(
-        handleColor = C.colors.accent,
-        backgroundColor = C.colors.accent.copy(alpha = 0.4f)
+        handleColor = S.colors.accent,
+        backgroundColor = S.colors.accent.copy(alpha = 0.4f)
     )
     val spacing = screenPadding.plus(PaddingValues(start = 12.dp, end = 12.dp))
         .copy(top = 0.dp, bottom = 0.dp)
@@ -334,14 +334,14 @@ private fun Result(
                             .weight(1f)
                             .focusRequester(focusRequester),
                         textStyle = largeInter.copy(
-                            color = C.colors.onBackgroundFaint1,
+                            color = S.colors.onBackgroundActive,
                             textAlign = TextAlign.Right
                         ),
-                        cursorBrush = SolidColor(C.colors.accent),
+                        cursorBrush = SolidColor(S.colors.accent),
                         outputTransformation = EquationTransformation(
-                            C.colors.onBackgroundFaint3,
-                            C.colors.error,
-                            C.colors.onBackgroundFaint2,
+                            S.colors.onBackgroundIgnored,
+                            S.colors.error,
+                            S.colors.onBackgroundDisabled,
                             stringResource(R.string.decimal)
                         ),
                         scrollState = equationScroll,
@@ -389,7 +389,7 @@ private fun Result(
                             )
                         else "",
                 style = veryLargeNDot.copy(
-                    color = C.colors.onBackground,
+                    color = S.colors.onBackground,
                     textAlign = TextAlign.Right,
                     fontSize = if (vm.result is EvaluateResult.Success) 55.sp else 30.sp
                 ),

@@ -10,13 +10,15 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import fr.jamesfrench.fluentcalculator.pages.CalculatorStandard
-import fr.jamesfrench.fluentcalculator.ui.theme.C
-import fr.jamesfrench.fluentcalculator.ui.theme.FluentCalculatorTheme
+import fr.jamesfrench.fluentcalculator.styling.FluentCalculatorTheme
+import fr.jamesfrench.fluentcalculator.styling.S
+import fr.jamesfrench.fluentcalculator.viewmodels.DataViewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -25,30 +27,37 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
 
         setContent {
-            FluentCalculatorTheme {
-                Scaffold(
-                    modifier = Modifier.fillMaxSize()
-                ) { innerPadding ->
-                    val layoutDirection = LocalLayoutDirection.current
-                    val screenPadding = PaddingValues(
-                        maxOf(0.dp, 12.dp - innerPadding.calculateLeftPadding(layoutDirection)),
-                        maxOf(0.dp, 12.dp - innerPadding.calculateTopPadding()),
-                        maxOf(0.dp, 12.dp - innerPadding.calculateRightPadding(layoutDirection)),
-                        maxOf(0.dp, 12.dp - innerPadding.calculateBottomPadding()),
-                    )
+            Content()
+        }
+    }
+}
 
-                    Box( // Background
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .background(C.colors.background)
-                            .padding(innerPadding)
-                    ) {
-                        CalculatorStandard(
-                            screenPadding,
-                            viewModel()
-                        )
-                    }
-                }
+@Composable
+fun Content(
+    d: DataViewModel = viewModel()
+) {
+    FluentCalculatorTheme(d.currentTheme) {
+        Scaffold(
+            modifier = Modifier.fillMaxSize()
+        ) { innerPadding ->
+            val layoutDirection = LocalLayoutDirection.current
+            val screenPadding = PaddingValues(
+                maxOf(0.dp, 12.dp - innerPadding.calculateLeftPadding(layoutDirection)),
+                maxOf(0.dp, 12.dp - innerPadding.calculateTopPadding()),
+                maxOf(0.dp, 12.dp - innerPadding.calculateRightPadding(layoutDirection)),
+                maxOf(0.dp, 12.dp - innerPadding.calculateBottomPadding()),
+            )
+
+            Box( // Background
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(S.colors.background)
+                    .padding(innerPadding)
+            ) {
+                CalculatorStandard(
+                    screenPadding,
+                    viewModel()
+                )
             }
         }
     }
