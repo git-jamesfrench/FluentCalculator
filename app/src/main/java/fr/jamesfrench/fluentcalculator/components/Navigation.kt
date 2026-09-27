@@ -39,7 +39,7 @@ import androidx.compose.ui.unit.sp
 import fr.jamesfrench.fluentcalculator.R
 import fr.jamesfrench.fluentcalculator.icons.LucideCog
 import fr.jamesfrench.fluentcalculator.icons.LucideHistory
-import fr.jamesfrench.fluentcalculator.styling.S
+import fr.jamesfrench.fluentcalculator.ui.theme.C
 
 private fun interpolate(values: List<Int>, index: Float): Float {
     val lowerIndex = index.toInt().coerceIn(0, values.size - 1)
@@ -55,7 +55,9 @@ private fun interpolate(values: List<Int>, index: Float): Float {
 @Composable
 fun Navigation(
     options: List<String>,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onSettingsClick: () -> Unit = {},
+    onHistoryClick: () -> Unit = {}
 ) {
     val textMeasurer: TextMeasurer = rememberTextMeasurer()
     var selectorSize by remember { mutableStateOf(IntSize.Zero) }
@@ -81,15 +83,18 @@ fun Navigation(
         modifier = modifier
             .fillMaxWidth()
             .height(IntrinsicSize.Min)
-            .border(1.dp, S.colors.surface, RoundedCornerShape(100))
+            .border(1.dp, C.colors.surface, RoundedCornerShape(100))
     ) {
         // Button 1
-        RoundButton(onClick = { return@RoundButton false }) {
+        RoundButton(onClick = {
+            onSettingsClick()
+            return@RoundButton false
+        }) {
             Icon(
                 LucideCog,
                 stringResource(R.string.settings),
                 size = 24.dp,
-                color = S.colors.onBackground
+                color = C.colors.onBackgroundFaint2
             )
         }
         // Tabs
@@ -137,22 +142,25 @@ fun Navigation(
                     .background(
                         brush = Brush.horizontalGradient(
                             colorStops = arrayOf(
-                                0f to S.colors.background,
+                                0f to C.colors.background,
                                 0.15f to Color.Transparent,
                                 0.85f to Color.Transparent,
-                                1f to S.colors.background,
+                                1f to C.colors.background,
                             )
                         )
                     )
             )
         }
         // Button 2
-        RoundButton(onClick = { return@RoundButton false }) {
+        RoundButton(onClick = {
+            onHistoryClick()
+            return@RoundButton true
+        }) {
             Icon(
                 LucideHistory,
                 stringResource(R.string.history),
                 size = 24.dp,
-                color = S.colors.onBackground
+                color = C.colors.onBackgroundFaint2
             )
         }
     }

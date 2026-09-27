@@ -46,13 +46,14 @@ import fr.jamesfrench.fluentcalculator.components.BigButton
 import fr.jamesfrench.fluentcalculator.components.BigButtonVariant
 import fr.jamesfrench.fluentcalculator.components.Navigation
 import fr.jamesfrench.fluentcalculator.components.Text
-import fr.jamesfrench.fluentcalculator.styling.S
+import fr.jamesfrench.fluentcalculator.ui.theme.C
 import fr.jamesfrench.fluentcalculator.ui.theme.largeInter
 import fr.jamesfrench.fluentcalculator.ui.theme.veryLargeNDot
 import fr.jamesfrench.fluentcalculator.utils.DisableSoftKeyboard
 import fr.jamesfrench.fluentcalculator.utils.copy
 import fr.jamesfrench.fluentcalculator.utils.isValidOperator
 import fr.jamesfrench.fluentcalculator.viewmodels.StandardViewModel
+import fr.jamesfrench.fluentcalculator.utils.CalculatorInputTransformation
 import kotlinx.coroutines.flow.distinctUntilChanged
 
 private val ButtonsVertical = listOf(
@@ -123,7 +124,8 @@ private val ButtonsHorizontal = listOf(
 @Composable
 fun CalculatorStandard(
     screenPadding: PaddingValues,
-    vm: StandardViewModel
+    vm: StandardViewModel,
+    onHistoryClick: () -> Unit = {}
 ) {
     val orientation = LocalConfiguration.current.orientation
     val layout = when (orientation) {
@@ -143,7 +145,8 @@ fun CalculatorStandard(
                 Result(
                     screenPadding.copy(end = 0.dp, bottom = 0.dp),
                     modifier = Modifier.weight(1f),
-                    vm
+                    vm,
+                    onHistoryClick = onHistoryClick
                 )
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -183,7 +186,8 @@ fun CalculatorStandard(
                 Result(
                     screenPadding.copy(bottom = 0.dp),
                     modifier = Modifier.weight(1f),
-                    vm
+                    vm,
+                    onHistoryClick = onHistoryClick
                 )
                 Column(
                     verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -275,18 +279,20 @@ class EquationTransformation(
 private fun Result(
     screenPadding: PaddingValues,
     modifier: Modifier = Modifier,
-    vm: StandardViewModel
+    vm: StandardViewModel,
+    onHistoryClick: () -> Unit = {}
 ) {
     val focusRequester = remember { FocusRequester() }
     val selectionColors = TextSelectionColors(
-        handleColor = S.colors.accent,
-        backgroundColor = S.colors.accent.copy(alpha = 0.4f)
+        handleColor = C.colors.accent,
+        backgroundColor = C.colors.accent.copy(alpha = 0.4f)
     )
     val spacing = screenPadding.plus(PaddingValues(start = 12.dp, end = 12.dp))
         .copy(top = 0.dp, bottom = 0.dp)
 
     val equationScroll = rememberScrollState()
     val resultScroll = rememberScrollState()
+    val decimal = stringResource(R.string.decimal)
 
     LaunchedEffect(vm.equation) {
         snapshotFlow { vm.equation.text.toString() }
@@ -313,7 +319,8 @@ private fun Result(
                 "Standard",
                 "Scientific",
             ),
-            Modifier.padding(screenPadding)
+            Modifier.padding(screenPadding),
+            onHistoryClick = onHistoryClick
         )
         Column(
             modifier = Modifier
@@ -334,16 +341,17 @@ private fun Result(
                             .weight(1f)
                             .focusRequester(focusRequester),
                         textStyle = largeInter.copy(
-                            color = S.colors.onBackgroundActive,
+                            color = C.colors.onBackgroundFaint1,
                             textAlign = TextAlign.Right
                         ),
-                        cursorBrush = SolidColor(S.colors.accent),
+                        cursorBrush = SolidColor(C.colors.accent),
                         outputTransformation = EquationTransformation(
-                            S.colors.onBackgroundIgnored,
-                            S.colors.error,
-                            S.colors.onBackgroundDisabled,
-                            stringResource(R.string.decimal)
+                            C.colors.onBackgroundFaint3,
+                            C.colors.error,
+                            C.colors.onBackgroundFaint2,
+                            decimal
                         ),
+                        inputTransformation = CalculatorInputTransformation(decimal),
                         scrollState = equationScroll,
                         decorator = { inner -> // Screen padding is calculated here, only to optimize clickable space.
                             Box(
@@ -389,7 +397,7 @@ private fun Result(
                             )
                         else "",
                 style = veryLargeNDot.copy(
-                    color = S.colors.onBackground,
+                    color = C.colors.onBackground,
                     textAlign = TextAlign.Right,
                     fontSize = if (vm.result is EvaluateResult.Success) 55.sp else 30.sp
                 ),

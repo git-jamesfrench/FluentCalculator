@@ -23,7 +23,7 @@ import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.unit.dp
 import fr.jamesfrench.fluentcalculator.classes.ButtonResponse
-import fr.jamesfrench.fluentcalculator.styling.S
+import fr.jamesfrench.fluentcalculator.ui.theme.C
 import fr.jamesfrench.fluentcalculator.ui.theme.largeInter
 import fr.jamesfrench.fluentcalculator.ui.theme.largeNDot
 import kotlinx.coroutines.delay
@@ -50,13 +50,13 @@ fun BigButton(
 
     val color by animateColorAsState(
         if (isPressed) when (variant) {
-            BigButtonVariant.Gray -> S.colors.activeNeutral
-            BigButtonVariant.Accent -> S.colors.activeAccent
-            BigButtonVariant.Inverse -> S.colors.activeInverse
+            BigButtonVariant.Gray -> C.colors.activeNeutral
+            BigButtonVariant.Accent -> C.colors.activeAccent
+            BigButtonVariant.Inverse -> C.colors.activeInverse
         } else when (variant) {
-            BigButtonVariant.Gray -> S.colors.neutral
-            BigButtonVariant.Accent -> S.colors.accent
-            BigButtonVariant.Inverse -> S.colors.inverse
+            BigButtonVariant.Gray -> C.colors.neutral
+            BigButtonVariant.Accent -> C.colors.accent
+            BigButtonVariant.Inverse -> C.colors.inverse
         },
         if (isPressed)
             tween(0, easing = EaseIn)
@@ -112,9 +112,9 @@ fun BigButton(
                 BigButtonVariant.Inverse -> largeNDot
             },
             color = when (variant) {
-                BigButtonVariant.Gray -> S.colors.onNeutral
-                BigButtonVariant.Accent -> S.colors.onAccent
-                BigButtonVariant.Inverse -> S.colors.onInverse
+                BigButtonVariant.Gray -> C.colors.onNeutral
+                BigButtonVariant.Accent -> C.colors.onAccent
+                BigButtonVariant.Inverse -> C.colors.onInverse
             }
         )
     }

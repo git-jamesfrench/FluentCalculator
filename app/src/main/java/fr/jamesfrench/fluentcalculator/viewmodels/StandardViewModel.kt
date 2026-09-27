@@ -1,11 +1,14 @@
 package fr.jamesfrench.fluentcalculator.viewmodels
 
+import android.app.Application
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.delete
+import androidx.compose.foundation.text.input.placeCursorAtEnd
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.viewModelScope
 import com.ezylang.evalex.EvaluationException
 import com.ezylang.evalex.Expression
 import com.ezylang.evalex.config.ExpressionConfiguration
@@ -15,8 +18,13 @@ import fr.jamesfrench.fluentcalculator.classes.Action
 import fr.jamesfrench.fluentcalculator.classes.ButtonResponse
 import fr.jamesfrench.fluentcalculator.classes.EvaluateResult
 import fr.jamesfrench.fluentcalculator.classes.T
+import fr.jamesfrench.fluentcalculator.data.HistoryEntry
+import fr.jamesfrench.fluentcalculator.data.HistoryRepository
+import fr.jamesfrench.fluentcalculator.data.ObjectBox
 import fr.jamesfrench.fluentcalculator.utils.isValidOperator
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.math.BigDecimal
 import java.math.RoundingMode
@@ -25,7 +33,7 @@ import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeoutException
 
-class StandardViewModel : ViewModel() {
+class StandardViewModel(application: Application) : AndroidViewModel(application) {
     private val configuration = ExpressionConfiguration.builder()
         .maxRecursionDepth(2000)
         .build()
@@ -33,6 +41,43 @@ class StandardViewModel : ViewModel() {
     var showErrorEquation by mutableStateOf(false)
     var closedParentheses by mutableStateOf(false)
     var result: EvaluateResult by mutableStateOf(EvaluateResult.Success("", false))
+
+    private val historyRepository =
+        HistoryRepository(ObjectBox.store.boxFor(HistoryEntry::class.java))
+    val history: StateFlow<List<HistoryEntry>> = historyRepository.history
+
+    override fun onCleared() {
+        historyRepository.close()
+        super.onCleared()
+    }
+
+    private fun addHistoryEntry(equationText: String, resultText: String) {
+        if (equationText.isBlank() || resultText.isBlank()) return
+
+        viewModelScope.launch {
+            historyRepository.add(equationText, resultText)
+        }
+    }
+
+    fun deleteHistoryEntry(id: Long) {
+        viewModelScope.launch {
+            historyRepository.delete(id)
+        }
+    }
+
+    fun clearHistory() {
+        viewModelScope.launch {
+            historyRepository.clear()
+        }
+    }
+
+    fun loadHistoryEntry(entry: HistoryEntry) {
+        equation.edit {
+            replace(0, length, entry.equation)
+            placeCursorAtEnd()
+        }
+        setClosedParentheses()
+    }
 
     fun executeKeyboardAction(action: Action, value: String = ""): ButtonResponse {
         var success = ButtonResponse(false, 0)
@@ -72,9 +117,14 @@ class StandardViewModel : ViewModel() {
 
                 Action.Equal -> {
                     if (result is EvaluateResult.Success && (result as EvaluateResult.Success).display) {
-                        replace(0, length, (result as EvaluateResult.Success).resultString)
+                        val resultString = (result as EvaluateResult.Success).resultString
+                        val previousEquation = cleanExpression(equation.text.toString())
+
+                        replace(0, length, resultString)
                         success = ButtonResponse(true, 1)
                         showErrorEquation = true
+
+                        addHistoryEntry(previousEquation, resultString)
                     }
                 }
             }
