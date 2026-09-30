@@ -21,6 +21,13 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    packaging {
+        resources.excludes += "graphml.xsd"
+        resources.excludes += "xlink.xsd"
+        resources.excludes += "viz.xsd"
+        resources.excludes += "gexf.xsd"
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = true
@@ -73,4 +80,5 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
     // Libs
     implementation(libs.evalex)
+    implementation(libs.matheclipse.core)
 }

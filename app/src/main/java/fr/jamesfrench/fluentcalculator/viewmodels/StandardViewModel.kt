@@ -7,8 +7,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import com.ezylang.evalex.EvaluationException
-import com.ezylang.evalex.Expression
-import com.ezylang.evalex.config.ExpressionConfiguration
 import com.ezylang.evalex.parser.ParseException
 import fr.jamesfrench.fluentcalculator.R
 import fr.jamesfrench.fluentcalculator.classes.Action
@@ -16,19 +14,10 @@ import fr.jamesfrench.fluentcalculator.classes.ButtonResponse
 import fr.jamesfrench.fluentcalculator.classes.EvaluateResult
 import fr.jamesfrench.fluentcalculator.classes.T
 import fr.jamesfrench.fluentcalculator.utils.isValidOperator
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
-import java.math.BigDecimal
-import java.math.RoundingMode
-import java.util.concurrent.Callable
-import java.util.concurrent.Executors
-import java.util.concurrent.TimeUnit
+import org.matheclipse.core.eval.ExprEvaluator
 import java.util.concurrent.TimeoutException
 
 class StandardViewModel : ViewModel() {
-    private val configuration = ExpressionConfiguration.builder()
-        .maxRecursionDepth(2000)
-        .build()
     var equation = TextFieldState("")
     var showErrorEquation by mutableStateOf(false)
     var closedParentheses by mutableStateOf(false)
@@ -150,37 +139,23 @@ class StandardViewModel : ViewModel() {
         return text
     }
 
-    @Suppress("BlockingMethodInNonBlockingContext")
-    suspend fun evaluate(): EvaluateResult = withContext(Dispatchers.Default) {
+    fun evaluate(): EvaluateResult {
         val cleanedExpression = cleanExpression(equation.text.toString())
-        val expression = Expression(cleanedExpression, configuration)
+        val expression = ExprEvaluator()
 
         if (cleanedExpression.isEmpty()) {
-            return@withContext EvaluateResult.Success("", false)
+            return EvaluateResult.Success("", false)
         }
 
-        val executor = Executors.newSingleThreadExecutor()
-        try {
-            val future = executor.submit(Callable {
-                expression.evaluate()
-            })
 
             try {
-                val result = future.get(200, TimeUnit.MILLISECONDS).numberValue
-                val rawResult = result.toPlainString()
-                val resultExpression = result
-                    .setScale(result.scale().coerceAtMost(15), RoundingMode.HALF_UP)
-                    .let {
-                        if (it.abs() > BigDecimal(10_000_000_000)) {
-                            it.toEngineeringString()
-                        } else {
-                            it.toPlainString()
-                        }
-                    }
+                val result = expression.eval(cleanedExpression)
+                val decimal = expression.eval("N($result,10)")
 
-                return@withContext EvaluateResult.Success(
-                    resultExpression,
-                    cleanedExpression != rawResult
+
+                return EvaluateResult.Success(
+                    "$result : $decimal",
+                    true
                 )
             } catch (exception: Exception) {
                 val exceptionCauseMessage =
@@ -193,7 +168,6 @@ class StandardViewModel : ViewModel() {
 
                 when {
                     exception is TimeoutException -> {
-                        future.cancel(true)
                         messageID = R.string.error_value_too_high_timeout
                         showImmediately = true
                     }
@@ -244,7 +218,7 @@ class StandardViewModel : ViewModel() {
                     }
                 }
 
-                return@withContext EvaluateResult.Error(
+                return EvaluateResult.Error(
                     showImmediately = showImmediately,
                     messageID = messageID,
                     message = exception.message,
@@ -252,9 +226,6 @@ class StandardViewModel : ViewModel() {
                 )
 
             }
-        } finally {
-            executor.shutdownNow()
-        }
     }
 
     fun clearall() {

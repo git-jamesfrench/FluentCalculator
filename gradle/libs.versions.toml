@@ -7,6 +7,7 @@ lifecycleRuntimeKtx = "2.11.0"
 activityCompose = "1.13.0"
 kotlin = "2.4.20"
 composeBom = "2026.09.00"
+matheclipseCore = "3.2.0"
 navigationCompose = "2.10.2"
 objectbox = "5.4.2"
 
@@ -22,6 +23,7 @@ androidx-compose-ui-tooling-preview = { group = "androidx.compose.ui", name = "u
 androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose" }
 androidx-compose-ui-text = { group = "androidx.compose.ui", name = "ui-text" }
 evalex = { module = "com.ezylang:EvalEx", version.ref = "evalex" }
+matheclipse-core = { module = "org.matheclipse:matheclipse-core", version.ref = "matheclipseCore" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
