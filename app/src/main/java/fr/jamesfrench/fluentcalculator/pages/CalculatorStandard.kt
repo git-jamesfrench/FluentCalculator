@@ -221,7 +221,8 @@ class EquationTransformation(
     private val disabledColor: Color = Color.Black,
     private val errorColor: Color = Color.Black,
     private val autoAddedColor: Color = Color.Black,
-    private val decimal: String = "."
+    private val decimal: String = ".",
+    private val lastExpression: String = ""
 ) : OutputTransformation {
     override fun TextFieldBuffer.transformOutput() {
         // Validation
@@ -267,6 +268,12 @@ class EquationTransformation(
         ) {
             insert(length, " " + T.CloseParentheses.value.toString())
             addStyle(SpanStyle(autoAddedColor), length - 1, length)
+        }
+
+        toString().forEachIndexed { i, v ->
+            if (v == 'x') {
+                replace(i, i + 1, lastExpression)
+            }
         }
     }
 }
@@ -343,7 +350,8 @@ private fun Result(
                             S.colors.onBackgroundIgnored,
                             S.colors.error,
                             S.colors.onBackgroundDisabled,
-                            stringResource(R.string.decimal)
+                            stringResource(R.string.decimal),
+                            vm.lastExpression
                         ),
                         scrollState = equationScroll,
                         decorator = { inner -> // Screen padding is calculated here, only to optimize clickable space.
@@ -384,7 +392,7 @@ private fun Result(
                         else ""
                     else
                         if ((vm.result as EvaluateResult.Success).display)
-                            (vm.result as EvaluateResult.Success).resultString.replace(
+                            (vm.result as EvaluateResult.Success).decimal.toString().replace(
                                 ".",
                                 stringResource(R.string.decimal)
                             )

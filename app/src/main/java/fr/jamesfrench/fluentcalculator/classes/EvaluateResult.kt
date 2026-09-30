@@ -1,8 +1,12 @@
 package fr.jamesfrench.fluentcalculator.classes
 
+import org.matheclipse.core.expression.F
+import org.matheclipse.core.interfaces.IExpr
+
 sealed interface EvaluateResult {
     data class Success(
-        val resultString: String,
+        val decimal: IExpr = F.Default,
+        val rational: IExpr = F.Default,
         val display: Boolean,
     ) : EvaluateResult
 

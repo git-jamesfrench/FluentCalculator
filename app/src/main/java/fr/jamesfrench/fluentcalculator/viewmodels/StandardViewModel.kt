@@ -21,8 +21,10 @@ class StandardViewModel : ViewModel() {
     var equation = TextFieldState("")
     var showErrorEquation by mutableStateOf(false)
     var closedParentheses by mutableStateOf(false)
-    var result: EvaluateResult by mutableStateOf(EvaluateResult.Success("", false))
+    var result: EvaluateResult by mutableStateOf(EvaluateResult.Success(display = false))
     val dataViewModel: DataViewModel? = null
+    val expression = ExprEvaluator()
+    var lastExpression by mutableStateOf("")
 
     fun executeKeyboardAction(action: Action, value: String = ""): ButtonResponse {
         var success = ButtonResponse(false, 0)
@@ -61,8 +63,10 @@ class StandardViewModel : ViewModel() {
                 }
 
                 Action.Equal -> {
-                    if (result is EvaluateResult.Success && (result as EvaluateResult.Success).display) {
-                        replace(0, length, (result as EvaluateResult.Success).resultString)
+                    if (true) {
+                        expression.defineVariable("x", (result as EvaluateResult.Success).rational)
+                        replace(0, length, "x")
+                        lastExpression = (result as EvaluateResult.Success).decimal.toString()
                         success = ButtonResponse(true, 1)
                         showErrorEquation = true
                     }
@@ -110,21 +114,21 @@ class StandardViewModel : ViewModel() {
             text = text.removeRange(indexes.start, indexes.end)
         }
 
-        for (char in text.reversed()) {
-            when (char) {
-                '0' -> {
-                    text = text.dropLast(1)
-                }
-
-                '.' -> {
-                    text = text.dropLast(1); break
-                }
-
-                else -> {
-                    break
-                }
-            }
-        }
+//        for (char in text.reversed()) {
+//            when (char) {
+//                '0' -> {
+//                    text = text.dropLast(1)
+//                }
+//
+//                '.' -> {
+//                    text = text.dropLast(1); break
+//                }
+//
+//                else -> {
+//                    break
+//                }
+//            }
+//        }
 
         repeat(
             maxOf(
@@ -141,10 +145,9 @@ class StandardViewModel : ViewModel() {
 
     fun evaluate(): EvaluateResult {
         val cleanedExpression = cleanExpression(equation.text.toString())
-        val expression = ExprEvaluator()
 
         if (cleanedExpression.isEmpty()) {
-            return EvaluateResult.Success("", false)
+            return EvaluateResult.Success(display = false)
         }
 
 
@@ -154,7 +157,8 @@ class StandardViewModel : ViewModel() {
 
 
                 return EvaluateResult.Success(
-                    "$result : $decimal",
+                    decimal,
+                    result,
                     true
                 )
             } catch (exception: Exception) {
