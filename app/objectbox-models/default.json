@@ -1,0 +1,238 @@
+{
+  "_note1": "KEEP THIS FILE! Check it into a version control system (VCS) like git.",
+  "_note2": "ObjectBox manages crucial IDs for your object model. See docs for details.",
+  "_note3": "If you have VCS merge conflicts, you must resolve them according to ObjectBox docs.",
+  "entities": [
+    {
+      "id": "1:3232483299761286344",
+      "lastPropertyId": "41:4945173119336137062",
+      "name": "Theme",
+      "properties": [
+        {
+          "id": "1:40447339608263760",
+          "name": "id",
+          "type": 6,
+          "flags": 129
+        },
+        {
+          "id": "19:3226999828249604905",
+          "name": "isStatusBarLight",
+          "type": 1
+        },
+        {
+          "id": "23:8024411238716066512",
+          "name": "name",
+          "indexId": "2:7287334055040301667",
+          "type": 9,
+          "flags": 34848
+        },
+        {
+          "id": "24:4285253483944216010",
+          "name": "isSystem",
+          "type": 1
+        },
+        {
+          "id": "25:2803955731711365609",
+          "name": "backgroundId",
+          "indexId": "3:6060374219554689584",
+          "type": 11,
+          "flags": 520,
+          "relationTarget": "Color"
+        },
+        {
+          "id": "26:1387498331256908856",
+          "name": "onBackgroundId",
+          "indexId": "4:2696707293785731149",
+          "type": 11,
+          "flags": 520,
+          "relationTarget": "Color"
+        },
+        {
+          "id": "27:696175297109492678",
+          "name": "onBackgroundActiveId",
+          "indexId": "5:5005188709637412459",
+          "type": 11,
+          "flags": 520,
+          "relationTarget": "Color"
+        },
+        {
+          "id": "28:5471774045388371482",
+          "name": "onBackgroundDisabledId",
+          "indexId": "6:236685158824363525",
+          "type": 11,
+          "flags": 520,
+          "relationTarget": "Color"
+        },
+        {
+          "id": "29:3919524320261375647",
+          "name": "onBackgroundIgnoredId",
+          "indexId": "7:7912279486006380729",
+          "type": 11,
+          "flags": 520,
+          "relationTarget": "Color"
+        },
+        {
+          "id": "30:3063869728417777471",
+          "name": "surfaceId",
+          "indexId": "8:4983054969880828186",
+          "type": 11,
+          "flags": 520,
+          "relationTarget": "Color"
+        },
+        {
+          "id": "31:187352322648415156",
+          "name": "onSurfaceId",
+          "indexId": "9:6394452034960922975",
+          "type": 11,
+          "flags": 520,
+          "relationTarget": "Color"
+        },
+        {
+          "id": "32:4085326027205877324",
+          "name": "neutralId",
+          "indexId": "10:4164126201471167686",
+          "type": 11,
+          "flags": 520,
+          "relationTarget": "Color"
+        },
+        {
+          "id": "33:1551089177068095465",
+          "name": "activeNeutralId",
+          "indexId": "11:1441191184504992019",
+          "type": 11,
+          "flags": 520,
+          "relationTarget": "Color"
+        },
+        {
+          "id": "34:8319865346700487470",
+          "name": "onNeutralId",
+          "indexId": "12:3643867324913105924",
+          "type": 11,
+          "flags": 520,
+          "relationTarget": "Color"
+        },
+        {
+          "id": "35:9031077804370278841",
+          "name": "inverseId",
+          "indexId": "13:8263420632613912060",
+          "type": 11,
+          "flags": 520,
+          "relationTarget": "Color"
+        },
+        {
+          "id": "36:5931881961428144729",
+          "name": "activeInverseId",
+          "indexId": "14:5986318421061387788",
+          "type": 11,
+          "flags": 520,
+          "relationTarget": "Color"
+        },
+        {
+          "id": "37:1359488958486237883",
+          "name": "onInverseId",
+          "indexId": "15:8783977399362306796",
+          "type": 11,
+          "flags": 520,
+          "relationTarget": "Color"
+        },
+        {
+          "id": "38:9021011538293910705",
+          "name": "accentId",
+          "indexId": "16:8632970634384928155",
+          "type": 11,
+          "flags": 520,
+          "relationTarget": "Color"
+        },
+        {
+          "id": "39:2299456219362223958",
+          "name": "activeAccentId",
+          "indexId": "17:244553419522854757",
+          "type": 11,
+          "flags": 520,
+          "relationTarget": "Color"
+        },
+        {
+          "id": "40:7598137095072422109",
+          "name": "onAccentId",
+          "indexId": "18:8179166143081067240",
+          "type": 11,
+          "flags": 520,
+          "relationTarget": "Color"
+        },
+        {
+          "id": "41:4945173119336137062",
+          "name": "errorId",
+          "indexId": "19:4932253629988882195",
+          "type": 11,
+          "flags": 520,
+          "relationTarget": "Color"
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "2:3882290642175310098",
+      "lastPropertyId": "4:119294553955417839",
+      "name": "Color",
+      "properties": [
+        {
+          "id": "1:3067976615984020024",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:795140717041167866",
+          "name": "name",
+          "type": 9
+        },
+        {
+          "id": "3:1387845491236304868",
+          "name": "value",
+          "type": 6
+        },
+        {
+          "id": "4:119294553955417839",
+          "name": "themeId",
+          "indexId": "1:4084501784050024417",
+          "type": 11,
+          "flags": 520,
+          "relationTarget": "Theme"
+        }
+      ],
+      "relations": []
+    }
+  ],
+  "lastEntityId": "2:3882290642175310098",
+  "lastIndexId": "19:4932253629988882195",
+  "lastRelationId": "0:0",
+  "lastSequenceId": "0:0",
+  "modelVersion": 5,
+  "modelVersionParserMinimum": 5,
+  "retiredEntityUids": [],
+  "retiredIndexUids": [],
+  "retiredPropertyUids": [
+    566253268140169262,
+    7168907928029675676,
+    792368921881875219,
+    3000729859678733782,
+    6061554010294934129,
+    3378948775845658144,
+    8278833717969952467,
+    104447776412975933,
+    101987469526595586,
+    7765045318975121867,
+    4723600554052770543,
+    7620244660892955233,
+    3984337733214945017,
+    2941232256611412275,
+    9067234738460700767,
+    7485590255205763961,
+    6631558041567666937,
+    3648534913286051591,
+    3830829448771140898,
+    6294895846837472215
+  ],
+  "retiredRelationUids": [],
+  "version": 1
+}

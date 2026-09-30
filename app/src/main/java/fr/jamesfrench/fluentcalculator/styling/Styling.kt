@@ -12,28 +12,29 @@ import androidx.core.view.WindowCompat
 import fr.jamesfrench.fluentcalculator.data.stores.Theme
 
 data class FluentCalculatorColors(
+    // Fallback theme
     val background: Color = Color.Black,
     val onBackground: Color = Color.White,
     val onBackgroundActive: Color = Color.White,
     val onBackgroundDisabled: Color = Color.White,
-    val onBackgroundIgnored: Color = Color.White,
+    val onBackgroundIgnored: Color = Color.Gray,
 
-    val surface: Color = Color.White,
-    val onSurface: Color = Color.Black,
+    val surface: Color = Color.Gray,
+    val onSurface: Color = Color.White,
 
-    val neutral: Color = Color.White,
-    val activeNeutral: Color = Color.White,
+    val neutral: Color = Color.Gray,
+    val activeNeutral: Color = Color.Gray,
     val onNeutral: Color = Color.Black,
 
     val inverse: Color = Color.White,
     val activeInverse: Color = Color.White,
     val onInverse: Color = Color.Black,
 
-    val accent: Color = Color.White,
-    val activeAccent: Color = Color.White,
-    val onAccent: Color = Color.Black,
+    val accent: Color = Color.Blue,
+    val activeAccent: Color = Color.Blue,
+    val onAccent: Color = Color.White,
 
-    val error: Color = Color.White,
+    val error: Color = Color.Red,
 
     val isStatusBarLight: Boolean = false,
 )

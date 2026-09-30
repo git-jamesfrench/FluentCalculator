@@ -40,6 +40,7 @@ import fr.jamesfrench.fluentcalculator.R
 import fr.jamesfrench.fluentcalculator.icons.LucideCog
 import fr.jamesfrench.fluentcalculator.icons.LucideHistory
 import fr.jamesfrench.fluentcalculator.styling.S
+import fr.jamesfrench.fluentcalculator.viewmodels.StandardViewModel
 
 private fun interpolate(values: List<Int>, index: Float): Float {
     val lowerIndex = index.toInt().coerceIn(0, values.size - 1)
@@ -55,7 +56,8 @@ private fun interpolate(values: List<Int>, index: Float): Float {
 @Composable
 fun Navigation(
     options: List<String>,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    vm: StandardViewModel
 ) {
     val textMeasurer: TextMeasurer = rememberTextMeasurer()
     var selectorSize by remember { mutableStateOf(IntSize.Zero) }

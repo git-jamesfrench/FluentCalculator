@@ -7,9 +7,11 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
@@ -25,6 +27,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         enableEdgeToEdge()
+        super.window.isNavigationBarContrastEnforced = false
 
         setContent {
             Content()
@@ -37,22 +40,25 @@ fun Content(
     d: DataViewModel = viewModel()
 ) {
     FluentCalculatorTheme(d.currentTheme) {
-        Scaffold(
-            modifier = Modifier.fillMaxSize()
-        ) { innerPadding ->
+        Box(
+            modifier = Modifier
+                .background(S.colors.background)
+                .fillMaxSize()
+        ) {
             val layoutDirection = LocalLayoutDirection.current
+            val windowInsets = WindowInsets.safeDrawing.asPaddingValues()
             val screenPadding = PaddingValues(
-                maxOf(0.dp, 12.dp - innerPadding.calculateLeftPadding(layoutDirection)),
-                maxOf(0.dp, 12.dp - innerPadding.calculateTopPadding()),
-                maxOf(0.dp, 12.dp - innerPadding.calculateRightPadding(layoutDirection)),
-                maxOf(0.dp, 12.dp - innerPadding.calculateBottomPadding()),
+                maxOf(0.dp, 12.dp - windowInsets.calculateLeftPadding(layoutDirection)),
+                maxOf(0.dp, 12.dp - windowInsets.calculateTopPadding()),
+                maxOf(0.dp, 12.dp - windowInsets.calculateRightPadding(layoutDirection)),
+                maxOf(0.dp, 12.dp - windowInsets.calculateBottomPadding()),
             )
 
             Box( // Background
                 modifier = Modifier
                     .fillMaxSize()
                     .background(S.colors.background)
-                    .padding(innerPadding)
+                    .padding(windowInsets)
             ) {
                 CalculatorStandard(
                     screenPadding,

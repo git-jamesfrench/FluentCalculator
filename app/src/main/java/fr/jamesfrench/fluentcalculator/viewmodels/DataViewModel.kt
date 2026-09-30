@@ -8,8 +8,6 @@ import fr.jamesfrench.fluentcalculator.styling.styles.nothingTheme
 import fr.jamesfrench.fluentcalculator.styling.styles.nothingThemeLight
 import kotlinx.coroutines.launch
 
-const val DEBUG = false
-
 class DataViewModel : ViewModel() {
     val themesBox = store.boxFor(Theme::class.java)
     var currentTheme: Theme? = null
@@ -17,10 +15,10 @@ class DataViewModel : ViewModel() {
     fun initThemes() {
         val themes = themesBox.all
 
-        if (themes.find { it.name == "Nothing Theme" } == null || DEBUG) {
+        if (themes.find { it.name == "Nothing Theme" } == null || false) {
             themesBox.put(nothingTheme())
         }
-        if (themes.find { it.name == "Nothing Theme Light" } == null || DEBUG) {
+        if (themes.find { it.name == "Nothing Theme Light" } == null || false) {
             themesBox.put(nothingThemeLight())
         }
     }
@@ -28,6 +26,10 @@ class DataViewModel : ViewModel() {
     fun loadTheme() {
         val theme = themesBox.all.find { it.name == "Nothing Theme" } // Hardcoded selected theme
         currentTheme = theme
+    }
+
+    fun deleteEverything() {
+        themesBox.query().build().remove()
     }
 
     init {

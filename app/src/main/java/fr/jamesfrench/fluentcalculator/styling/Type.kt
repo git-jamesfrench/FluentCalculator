@@ -1,4 +1,4 @@
-package fr.jamesfrench.fluentcalculator.ui.theme
+package fr.jamesfrench.fluentcalculator.styling
 
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font

@@ -1,12 +1,12 @@
 package fr.jamesfrench.fluentcalculator.components
 
+import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import fr.jamesfrench.fluentcalculator.styling.S
-import fr.jamesfrench.fluentcalculator.ui.theme.mediumInter
-import androidx.compose.material3.Text as MText
+import fr.jamesfrench.fluentcalculator.styling.mediumInter
 
 @Composable
 fun Text(
@@ -15,10 +15,9 @@ fun Text(
     style: TextStyle = mediumInter,
     color: Color = S.colors.onBackground,
 ) {
-    MText(
+    BasicText(
         text = text,
-        style = style,
-        color = color,
+        style = style.copy(color = color),
         modifier = modifier
     )
 }

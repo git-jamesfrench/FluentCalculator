@@ -33,6 +33,7 @@ class StandardViewModel : ViewModel() {
     var showErrorEquation by mutableStateOf(false)
     var closedParentheses by mutableStateOf(false)
     var result: EvaluateResult by mutableStateOf(EvaluateResult.Success("", false))
+    val dataViewModel: DataViewModel? = null
 
     fun executeKeyboardAction(action: Action, value: String = ""): ButtonResponse {
         var success = ButtonResponse(false, 0)
@@ -254,5 +255,9 @@ class StandardViewModel : ViewModel() {
         } finally {
             executor.shutdownNow()
         }
+    }
+
+    fun clearall() {
+        dataViewModel?.deleteEverything()
     }
 }

@@ -21,7 +21,7 @@ fun nothingTheme(): Theme {
     val gray = Color(name = "Gray", value = 0xFF6E6E6E)
 
     val black = Color(name = "Black", value = 0xFF000000)
-    val faintDarkGray = Color(name = "Fain Dark Gray", value = 0xFF19191a)
+    val faintDarkGray = Color(name = "Faint Dark Gray", value = 0xFF19191a)
     val darkGray = Color(name = "Dark Gray", value = 0xFF323234)
     // Values
     theme.background.target = black

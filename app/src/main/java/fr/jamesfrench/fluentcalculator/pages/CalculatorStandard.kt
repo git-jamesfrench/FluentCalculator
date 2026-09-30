@@ -47,8 +47,8 @@ import fr.jamesfrench.fluentcalculator.components.BigButtonVariant
 import fr.jamesfrench.fluentcalculator.components.Navigation
 import fr.jamesfrench.fluentcalculator.components.Text
 import fr.jamesfrench.fluentcalculator.styling.S
-import fr.jamesfrench.fluentcalculator.ui.theme.largeInter
-import fr.jamesfrench.fluentcalculator.ui.theme.veryLargeNDot
+import fr.jamesfrench.fluentcalculator.styling.largeInter
+import fr.jamesfrench.fluentcalculator.styling.veryLargeNDot
 import fr.jamesfrench.fluentcalculator.utils.DisableSoftKeyboard
 import fr.jamesfrench.fluentcalculator.utils.copy
 import fr.jamesfrench.fluentcalculator.utils.isValidOperator
@@ -313,7 +313,8 @@ private fun Result(
                 "Standard",
                 "Scientific",
             ),
-            Modifier.padding(screenPadding)
+            Modifier.padding(screenPadding),
+            vm
         )
         Column(
             modifier = Modifier

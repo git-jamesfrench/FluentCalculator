@@ -24,8 +24,8 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.unit.dp
 import fr.jamesfrench.fluentcalculator.classes.ButtonResponse
 import fr.jamesfrench.fluentcalculator.styling.S
-import fr.jamesfrench.fluentcalculator.ui.theme.largeInter
-import fr.jamesfrench.fluentcalculator.ui.theme.largeNDot
+import fr.jamesfrench.fluentcalculator.styling.largeInter
+import fr.jamesfrench.fluentcalculator.styling.largeNDot
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.time.Duration.Companion.milliseconds
