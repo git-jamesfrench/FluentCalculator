@@ -7,19 +7,15 @@
 <p align="center">
   <img alt="Platform" src="https://img.shields.io/badge/platform-Android-3DDC84?logo=android&logoColor=white">
   <img alt="Kotlin" src="https://img.shields.io/badge/language-Kotlin-7F52FF?logo=kotlin&logoColor=white">
-  [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+  <img alt="GitHub License" src="https://img.shields.io/github/license/git-jamesfrench/FluentCalculator">
 </p>
 
----
-
 ## <p align="center">Features</p>
-
 - Clean, minimal calculator UI
 - Standard arithmetic operations
 - Built entirely with Jetpack Compose
 
 ## <p align="center">Roadmap</p>
-
 - [ ] Fully customizable themes
 - [ ] Settings & preferences
 - [ ] History
@@ -27,7 +23,6 @@
 - [ ] Conversion mode
 
 ## <p align="center">Getting Started</p>
-
 ### Prerequisites
 - Android Studio (latest stable)
 - Android SDK
@@ -62,14 +57,12 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ```
 
 ## <p align="center">Credits</p>
-
 This application and Github repository is using:
 
 - NDot77 (Japan expanded) by [NOTHING](https://nothing.tech/) Tech.
 - Icons from [Lucide](https://lucide.dev/).
 
 ## <div align="center">Contact Us</div>
-
 If you have reclamations, please reach out to me:
 
 - Email: **[contact@jamesfrench.fr](mailto:contact@jamesfrench.fr)**
